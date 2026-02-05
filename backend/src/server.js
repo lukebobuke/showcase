@@ -3,6 +3,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import testRoutes from "./routes/testRoutes.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
 
@@ -16,6 +18,11 @@ app.use(
 	}),
 );
 app.use(express.json());
+
+// Routes
+app.use("/api/test", testRoutes);
+
+app.use(errorHandler);
 
 // Test route
 app.get("/api/health", (req, res) => {
