@@ -3,7 +3,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import testRoutes from "./routes/testRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -20,7 +20,7 @@ app.use(
 app.use(express.json());
 
 // Routes
-app.use("/api/test", testRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use(errorHandler);
 
