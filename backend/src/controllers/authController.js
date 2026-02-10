@@ -104,16 +104,29 @@ export const register = async (req, res) => {
 			},
 		});
 
-		// 9. Generate JWT token
+		// 9. Create page for the new user
+		const newPage = await prisma.page.create({
+			data: {
+				userId: newUser.id,
+				theme: "ocean-light",
+				headerImage: null,
+			},
+		});
+
+		// 10. Generate JWT token
 		const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-		// 10. Return response (exclude passwordHash)
+		// 11. Return response (exclude passwordHash)
 		return res.status(201).json({
 			token,
 			user: {
 				id: newUser.id,
 				username: newUser.username,
 				email: newUser.email,
+			},
+			page: {
+				id: newPage.id,
+				theme: newPage.theme,
 			},
 		});
 	} catch (error) {
