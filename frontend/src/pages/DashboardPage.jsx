@@ -10,16 +10,29 @@ import AddWidgetModal from "../components/AddWidgetModal";
 
 export default function DashboardPage() {
 	const { user, token, logout } = useAuth();
-	const { page, editMode, loading, loadMyPage, updateTheme, toggleEditMode, addWidget, removeWidget, reorderPageWidgets } = usePage();
+	const { page, editMode, loading, loadMyPage, updateTheme, toggleEditMode, addWidget, removeWidget, updateWidgetData, reorderPageWidgets } =
+		usePage();
 	const navigate = useNavigate();
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [operationLoading, setOperationLoading] = useState(false);
+	const [newlyCreatedWidgetId, setNewlyCreatedWidgetId] = useState(null);
+	const [error, setError] = useState(null);
 
 	useEffect(() => {
 		if (token) {
 			loadMyPage(token);
 		}
 	}, [token]);
+
+	// Auto-dismiss error after 5 seconds
+	useEffect(() => {
+		if (error) {
+			const timer = setTimeout(() => {
+				setError(null);
+			}, 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [error]);
 
 	const handleThemeChange = async (newTheme) => {
 		try {
@@ -37,13 +50,16 @@ export default function DashboardPage() {
 
 	const handleAddWidget = async (widgetType) => {
 		setOperationLoading(true);
+		setError(null);
 		try {
-			await addWidget(token, widgetType);
+			const widget = await addWidget(token, widgetType);
 			setShowAddModal(false);
+			// Store the newly created widget ID to auto-open its editor
+			setNewlyCreatedWidgetId(widget.widget.id);
 			alert("Widget added!");
-		} catch (error) {
-			console.error("Error adding widget:", error);
-			alert("Failed to add widget. Please try again.");
+		} catch (err) {
+			console.error("Error adding widget:", err);
+			setError(err.message || "Failed to add widget. Please try again.");
 		} finally {
 			setOperationLoading(false);
 		}
@@ -51,12 +67,13 @@ export default function DashboardPage() {
 
 	const handleDeleteWidget = async (widgetId) => {
 		setOperationLoading(true);
+		setError(null);
 		try {
 			await removeWidget(token, widgetId);
 			alert("Widget deleted!");
-		} catch (error) {
-			console.error("Error deleting widget:", error);
-			alert("Failed to delete widget. Please try again.");
+		} catch (err) {
+			console.error("Error deleting widget:", err);
+			setError(err.message || "Failed to delete widget. Please try again.");
 		} finally {
 			setOperationLoading(false);
 		}
@@ -66,15 +83,16 @@ export default function DashboardPage() {
 		if (index === 0) return; // Can't move up if already first
 
 		setOperationLoading(true);
+		setError(null);
 		try {
 			const newWidgets = [...page.widgets];
 			[newWidgets[index], newWidgets[index - 1]] = [newWidgets[index - 1], newWidgets[index]];
 			const widgetIds = newWidgets.map((w) => w.id);
 			await reorderPageWidgets(token, widgetIds);
 			console.log("Widget reordered successfully");
-		} catch (error) {
-			console.error("Error reordering widgets:", error);
-			alert("Failed to reorder widgets. Please try again.");
+		} catch (err) {
+			console.error("Error reordering widgets:", err);
+			setError(err.message || "Failed to reorder widgets. Please try again.");
 		} finally {
 			setOperationLoading(false);
 		}
@@ -84,15 +102,30 @@ export default function DashboardPage() {
 		if (index === page.widgets.length - 1) return; // Can't move down if already last
 
 		setOperationLoading(true);
+		setError(null);
 		try {
 			const newWidgets = [...page.widgets];
 			[newWidgets[index], newWidgets[index + 1]] = [newWidgets[index + 1], newWidgets[index]];
 			const widgetIds = newWidgets.map((w) => w.id);
 			await reorderPageWidgets(token, widgetIds);
 			console.log("Widget reordered successfully");
-		} catch (error) {
-			console.error("Error reordering widgets:", error);
-			alert("Failed to reorder widgets. Please try again.");
+		} catch (err) {
+			console.error("Error reordering widgets:", err);
+			setError(err.message || "Failed to reorder widgets. Please try again.");
+		} finally {
+			setOperationLoading(false);
+		}
+	};
+
+	const handleUpdateWidget = async (widgetId, newData) => {
+		setOperationLoading(true);
+		setError(null);
+		try {
+			await updateWidgetData(token, widgetId, newData);
+			alert("Widget updated!");
+		} catch (err) {
+			console.error("Error updating widget:", err);
+			setError(err.message || "Failed to update widget. Please try again.");
 		} finally {
 			setOperationLoading(false);
 		}
@@ -110,6 +143,9 @@ export default function DashboardPage() {
 		<div>
 			<h1 className="text-2xl font-bold mb-4">Welcome, {user?.username}!</h1>
 			<p className="mb-4">Email: {user?.email}</p>
+
+			{/* Error message banner */}
+			{error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
 			<div className="mb-4">
 				<p className="text-gray-700">
@@ -151,7 +187,10 @@ export default function DashboardPage() {
 					onDelete={handleDeleteWidget}
 					onMoveUp={handleMoveUp}
 					onMoveDown={handleMoveDown}
+					onUpdateWidget={handleUpdateWidget}
 					disabled={operationLoading}
+					newlyCreatedWidgetId={newlyCreatedWidgetId}
+					onClearNewlyCreated={() => setNewlyCreatedWidgetId(null)}
 				/>
 				{editMode && (
 					<button

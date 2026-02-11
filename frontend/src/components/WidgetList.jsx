@@ -2,7 +2,17 @@
 
 import WidgetContainer from "./WidgetContainer";
 
-export default function WidgetList({ widgets, editMode, onDelete, onMoveUp, onMoveDown, disabled }) {
+export default function WidgetList({
+	widgets,
+	editMode,
+	onDelete,
+	onMoveUp,
+	onMoveDown,
+	onUpdateWidget,
+	disabled,
+	newlyCreatedWidgetId,
+	onClearNewlyCreated,
+}) {
 	// Empty state
 	if (!widgets || widgets.length === 0) {
 		return (
@@ -30,9 +40,12 @@ export default function WidgetList({ widgets, editMode, onDelete, onMoveUp, onMo
 						onDelete={onDelete}
 						onMoveUp={!isFirst ? () => onMoveUp(index) : undefined}
 						onMoveDown={!isLast ? () => onMoveDown(index) : undefined}
+						onUpdateWidget={onUpdateWidget}
 						isFirst={isFirst}
 						isLast={isLast}
 						disabled={disabled}
+						autoOpenEditor={widget.id === newlyCreatedWidgetId}
+						onEditorOpened={onClearNewlyCreated}
 					/>
 				);
 			})}

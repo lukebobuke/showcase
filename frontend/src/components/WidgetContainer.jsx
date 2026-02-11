@@ -1,9 +1,62 @@
 /** @format */
 
-export default function WidgetContainer({ widget, editMode, onDelete, onMoveUp, onMoveDown, isFirst, isLast, disabled }) {
+import { useState, useEffect } from "react";
+import TextWidget from "./widgets/TextWidget";
+import TextWidgetEditor from "./widgets/TextWidgetEditor";
+import LinksWidget from "./widgets/LinksWidget";
+import LinksWidgetEditor from "./widgets/LinksWidgetEditor";
+
+export default function WidgetContainer({
+	widget,
+	editMode,
+	onDelete,
+	onMoveUp,
+	onMoveDown,
+	isFirst,
+	isLast,
+	disabled,
+	onUpdateWidget,
+	autoOpenEditor,
+	onEditorOpened,
+}) {
+	const [showEditModal, setShowEditModal] = useState(false);
+
+	// Auto-open editor for newly created widgets
+	useEffect(() => {
+		if (autoOpenEditor && editMode) {
+			setShowEditModal(true);
+			// Notify parent that editor has been opened
+			if (onEditorOpened) {
+				onEditorOpened();
+			}
+		}
+	}, [autoOpenEditor, editMode, onEditorOpened]);
+
 	const handleDelete = () => {
 		if (window.confirm("Delete this widget?")) {
 			onDelete(widget.id);
+		}
+	};
+
+	const handleSaveContent = (newData) => {
+		onUpdateWidget(widget.id, newData);
+		setShowEditModal(false);
+	};
+
+	const renderWidgetContent = () => {
+		switch (widget.widgetType) {
+			case "text":
+				return <TextWidget widgetData={widget.widgetData} editMode={editMode} />;
+			case "links":
+				return <LinksWidget widgetData={widget.widgetData} />;
+			case "photos":
+				return <div>Photo album (Week 2)</div>;
+			case "youtube":
+				return <div>YouTube widget (Week 2)</div>;
+			case "tour_dates":
+				return <div>Tour dates (Week 2)</div>;
+			default:
+				return <div>Unknown widget type</div>;
 		}
 	};
 
@@ -13,9 +66,7 @@ export default function WidgetContainer({ widget, editMode, onDelete, onMoveUp, 
 			<span className="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm">{widget.widgetType}</span>
 
 			{/* Widget content area */}
-			<div className="mt-6">
-				<p className="text-gray-600">Widget content: {widget.widgetType}</p>
-			</div>
+			<div className="mt-6">{renderWidgetContent()}</div>
 
 			{/* Edit mode controls */}
 			{editMode && (
@@ -48,9 +99,10 @@ export default function WidgetContainer({ widget, editMode, onDelete, onMoveUp, 
 
 					{/* Edit button */}
 					<button
+						onClick={() => setShowEditModal(true)}
 						disabled={disabled}
 						className={`px-2 py-1 text-white text-xs rounded ${
-							disabled ? "bg-gray-400 cursor-not-allowed" : "bg-gray-500 hover:bg-gray-600"
+							disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
 						}`}
 						title="Edit">
 						Edit
@@ -69,6 +121,26 @@ export default function WidgetContainer({ widget, editMode, onDelete, onMoveUp, 
 						</button>
 					)}
 				</div>
+			)}
+
+			{/* Edit Modal - Text Widget */}
+			{widget.widgetType === "text" && (
+				<TextWidgetEditor
+					isOpen={showEditModal}
+					initialContent={widget.widgetData?.content || ""}
+					onSave={(newContent) => handleSaveContent({ content: newContent })}
+					onClose={() => setShowEditModal(false)}
+				/>
+			)}
+
+			{/* Edit Modal - Links Widget */}
+			{widget.widgetType === "links" && (
+				<LinksWidgetEditor
+					isOpen={showEditModal}
+					initialLinks={widget.widgetData?.links || []}
+					onSave={(newData) => handleSaveContent(newData)}
+					onClose={() => setShowEditModal(false)}
+				/>
 			)}
 		</div>
 	);
