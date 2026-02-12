@@ -5,6 +5,10 @@ import TextWidget from "./widgets/TextWidget";
 import TextWidgetEditor from "./widgets/TextWidgetEditor";
 import LinksWidget from "./widgets/LinksWidget";
 import LinksWidgetEditor from "./widgets/LinksWidgetEditor";
+import PhotoAlbumWidget from "./widgets/PhotoAlbumWidget";
+import PhotoAlbumEditor from "./widgets/PhotoAlbumEditor";
+import YouTubeWidget from "./widgets/YouTubeWidget";
+import YouTubeWidgetEditor from "./widgets/YoutubeWidgetEditor";
 
 export default function WidgetContainer({
 	widget,
@@ -50,9 +54,9 @@ export default function WidgetContainer({
 			case "links":
 				return <LinksWidget widgetData={widget.widgetData} />;
 			case "photos":
-				return <div>Photo album (Week 2)</div>;
+				return <PhotoAlbumWidget widgetData={widget.widgetData} />;
 			case "youtube":
-				return <div>YouTube widget (Week 2)</div>;
+				return <YouTubeWidget widgetData={widget.widgetData} />;
 			case "tour_dates":
 				return <div>Tour dates (Week 2)</div>;
 			default:
@@ -138,6 +142,26 @@ export default function WidgetContainer({
 				<LinksWidgetEditor
 					isOpen={showEditModal}
 					initialLinks={widget.widgetData?.links || []}
+					onSave={(newData) => handleSaveContent(newData)}
+					onClose={() => setShowEditModal(false)}
+				/>
+			)}
+
+			{/* Edit Modal - Photos Widget */}
+			{widget.widgetType === "photos" && (
+				<PhotoAlbumEditor
+					isOpen={showEditModal}
+					initialImages={widget.widgetData?.images || []}
+					onSave={(newData) => handleSaveContent(newData)}
+					onClose={() => setShowEditModal(false)}
+				/>
+			)}
+
+			{/* Edit Modal - YouTube Widget */}
+			{widget.widgetType === "youtube" && (
+				<YouTubeWidgetEditor
+					isOpen={showEditModal}
+					initialVideoUrl={widget.widgetData?.videoUrl || ""}
 					onSave={(newData) => handleSaveContent(newData)}
 					onClose={() => setShowEditModal(false)}
 				/>
