@@ -9,6 +9,8 @@ import PhotoAlbumWidget from "./widgets/PhotoAlbumWidget";
 import PhotoAlbumEditor from "./widgets/PhotoAlbumEditor";
 import YouTubeWidget from "./widgets/YouTubeWidget";
 import YouTubeWidgetEditor from "./widgets/YoutubeWidgetEditor";
+import TourDatesWidget from "./widgets/TourDatesWidget";
+import TourDatesEditor from "./widgets/TourDatesEditor";
 
 export default function WidgetContainer({
 	widget,
@@ -58,7 +60,7 @@ export default function WidgetContainer({
 			case "youtube":
 				return <YouTubeWidget widgetData={widget.widgetData} />;
 			case "tour_dates":
-				return <div>Tour dates (Week 2)</div>;
+				return <TourDatesWidget widgetData={widget.widgetData} />;
 			default:
 				return <div>Unknown widget type</div>;
 		}
@@ -162,6 +164,16 @@ export default function WidgetContainer({
 				<YouTubeWidgetEditor
 					isOpen={showEditModal}
 					initialVideoUrl={widget.widgetData?.videoUrl || ""}
+					onSave={(newData) => handleSaveContent(newData)}
+					onClose={() => setShowEditModal(false)}
+				/>
+			)}
+
+			{/* Edit Modal - Tour Dates Widget */}
+			{widget.widgetType === "tour_dates" && (
+				<TourDatesEditor
+					isOpen={showEditModal}
+					initialDates={widget.widgetData?.dates || []}
 					onSave={(newData) => handleSaveContent(newData)}
 					onClose={() => setShowEditModal(false)}
 				/>

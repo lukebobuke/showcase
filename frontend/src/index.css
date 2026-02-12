@@ -4,6 +4,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "leaflet/dist/leaflet.css";
+
+/* Responsive map heights */
+.leaflet-container {
+	height: 16rem; /* 256px mobile */
+}
+
+@media (min-width: 768px) {
+	.leaflet-container {
+		height: 24rem; /* 384px desktop */
+	}
+}
+
+/* Mobile-friendly popups */
+@media (max-width: 767px) {
+	.leaflet-popup-content-wrapper {
+		font-size: 0.875rem;
+	}
+	.leaflet-popup-content {
+		margin: 8px 10px;
+	}
+}
+
 :root {
 	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 	line-height: 1.5;
