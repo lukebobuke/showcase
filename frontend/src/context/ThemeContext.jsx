@@ -3,7 +3,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { getTheme } from "../config/themes";
 
-// Create the theme context
+/**
+ * Context for managing theme state and applying dynamic CSS variables
+ * Handles theme switching and persists theme preference
+ */
 const ThemeContext = createContext();
 
 /**

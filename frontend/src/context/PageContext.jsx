@@ -3,6 +3,10 @@
 import { createContext, useContext, useState } from "react";
 import { getMyPage, updatePage, createWidget, updateWidget, deleteWidget, reorderWidgets } from "../services/api";
 
+/**
+ * Context for managing page and widget state
+ * Provides centralized state management for user's page data and CRUD operations
+ */
 const PageContext = createContext();
 
 export function PageProvider({ children }) {
@@ -27,7 +31,11 @@ export function PageProvider({ children }) {
 		try {
 			setLoading(true);
 			const data = await updatePage(token, theme, page?.headerImage);
-			setPage(data.page);
+			setPage((prev) => ({
+				...prev,
+				...data.page,
+				widgets: prev?.widgets || [],
+			}));
 		} catch (error) {
 			console.error("Error updating theme:", error);
 			throw error;

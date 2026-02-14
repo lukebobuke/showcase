@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { geocodeCity } from "../../utils/geocoding";
 
-export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose }) {
+export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose, isSaving }) {
 	const [dates, setDates] = useState([]);
 	const [editingIndex, setEditingIndex] = useState(null);
 	const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 		ticketLink: "",
 	});
 	const [error, setError] = useState("");
+	const [dateWarning, setDateWarning] = useState("");
 	const [isGeocoding, setIsGeocoding] = useState(false);
 	const [successMessage, setSuccessMessage] = useState("");
 
@@ -23,15 +24,29 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 			setEditingIndex(null);
 			setFormData({ city: "", venue: "", date: "", ticketLink: "" });
 			setError("");
+			setDateWarning("");
 			setSuccessMessage("");
 		}
 	}, [isOpen, initialDates]);
+
+	// ESC key to close modal
+	useEffect(() => {
+		const handleEsc = (e) => {
+			if (e.key === "Escape" && !isGeocoding) onClose();
+		};
+
+		if (isOpen) {
+			document.addEventListener("keydown", handleEsc);
+			return () => document.removeEventListener("keydown", handleEsc);
+		}
+	}, [isOpen, onClose, isGeocoding]);
 
 	// Start adding a new date
 	const addDate = () => {
 		setEditingIndex(-1); // -1 indicates new date
 		setFormData({ city: "", venue: "", date: "", ticketLink: "" });
 		setError("");
+		setDateWarning("");
 	};
 
 	// Start editing an existing date
@@ -45,6 +60,7 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 			ticketLink: dateToEdit.ticketLink || "",
 		});
 		setError("");
+		setDateWarning("");
 	};
 
 	// Save the current form data
@@ -60,6 +76,16 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 		}
 		if (!formData.date) {
 			setError("Date is required");
+			return;
+		}
+
+		// Check if date is too far in the past
+		const selectedDate = new Date(formData.date);
+		const oneYearAgo = new Date();
+		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+		if (selectedDate < oneYearAgo) {
+			setError("Date is more than 1 year in the past. Please enter a current or upcoming tour date.");
 			return;
 		}
 
@@ -95,6 +121,7 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 		setEditingIndex(null);
 		setFormData({ city: "", venue: "", date: "", ticketLink: "" });
 		setError("");
+		setDateWarning("");
 		setSuccessMessage(editingIndex === -1 ? "Date added successfully!" : "Date updated successfully!");
 
 		// Clear success message after 3 seconds
@@ -118,6 +145,7 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 		setEditingIndex(null);
 		setFormData({ city: "", venue: "", date: "", ticketLink: "" });
 		setError("");
+		setDateWarning("");
 		setSuccessMessage("");
 	};
 
@@ -130,8 +158,8 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-			<div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+			<div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-modalSlideIn">
 				<h2 className="text-2xl font-bold mb-4">Edit Tour Dates</h2>
 
 				{/* Error message */}
@@ -187,12 +215,12 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 											<div className="flex gap-2">
 												<button
 													onClick={() => editDate(originalIndex)}
-													className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+													className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-transform hover:scale-105">
 													Edit
 												</button>
 												<button
 													onClick={() => deleteDate(originalIndex)}
-													className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">
+													className="danger bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-transform hover:scale-105">
 													Delete
 												</button>
 											</div>
@@ -205,7 +233,9 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 
 				{/* Add Date button */}
 				{editingIndex === null && (
-					<button onClick={addDate} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mb-4">
+					<button
+						onClick={addDate}
+						className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mb-4 transition-transform hover:scale-105">
 						+ Add Tour Date
 					</button>
 				)}
@@ -252,47 +282,80 @@ export default function TourDatesEditor({ isOpen, initialDates, onSave, onClose 
 								<input
 									type="date"
 									value={formData.date}
-									onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+									onChange={(e) => {
+										setFormData({ ...formData, date: e.target.value });
+										// Show warning if date is in the past
+										const selectedDate = new Date(e.target.value);
+										const today = new Date();
+										today.setHours(0, 0, 0, 0);
+
+										if (selectedDate < today) {
+											const oneYearAgo = new Date();
+											oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+											if (selectedDate < oneYearAgo) {
+												setDateWarning("");
+											} else {
+												setDateWarning("This date is in the past");
+											}
+										} else {
+											setDateWarning("");
+										}
+									}}
 									className="w-full p-2 border rounded"
 								/>
+								{dateWarning && <div className="text-yellow-600 text-xs mt-1">{dateWarning}</div>}
 							</div>
 
 							{/* Ticket Link */}
 							<div>
-								<label className="block text-sm font-medium mb-1">Ticket Link (optional)</label>
+								<label className="block mb-1 font-medium">Ticket Link (optional)</label>
 								<input
-									type="url"
-									value={formData.ticketLink}
+									type="text"
+									value={formData.ticketLink || ""}
 									onChange={(e) => setFormData({ ...formData, ticketLink: e.target.value })}
-									placeholder="https://tickets.com/event"
+									placeholder="https://..."
 									className="w-full p-2 border rounded"
 								/>
 							</div>
-						</div>
 
-						{/* Form buttons */}
-						<div className="flex gap-2 mt-4">
-							<button
-								onClick={saveDate}
-								disabled={isGeocoding}
-								className={`px-4 py-2 rounded ${
-									isGeocoding ? "bg-gray-400 cursor-not-allowed text-white" : "bg-blue-600 text-white hover:bg-blue-700"
-								}`}>
-								{editingIndex === -1 ? "Add Date" : "Save Changes"}
-							</button>
-							<button onClick={cancelEdit} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-								Cancel
-							</button>
+							{/* Save and Cancel buttons */}
+							<div className="flex gap-2 justify-end mt-4">
+								<button
+									onClick={saveDate}
+									disabled={isGeocoding}
+									className={`px-4 py-2 rounded transition-transform ${
+										isGeocoding ?
+											"bg-gray-400 cursor-not-allowed text-white"
+										:	"bg-blue-600 text-white hover:bg-blue-700 hover:scale-105"
+									}`}>
+									{isGeocoding ?
+										"Looking up location..."
+									: editingIndex === -1 ?
+										"Add Date"
+									:	"Save Changes"}
+								</button>
+								<button
+									onClick={cancelEdit}
+									disabled={isGeocoding}
+									className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:bg-gray-400 transition-transform hover:scale-105 disabled:hover:scale-100">
+									Cancel
+								</button>
+							</div>
 						</div>
 					</div>
 				)}
 
 				{/* Modal buttons */}
 				<div className="flex justify-end gap-2 mt-4">
-					<button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+					<button
+						onClick={onClose}
+						className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-transform hover:scale-105">
 						Close
 					</button>
-					<button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+					<button
+						onClick={handleSave}
+						className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-transform hover:scale-105">
 						Save All
 					</button>
 				</div>

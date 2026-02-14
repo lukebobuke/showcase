@@ -1,6 +1,8 @@
 /** @format */
 
-export default function LinksWidget({ widgetData }) {
+import React from "react";
+
+function LinksWidget({ widgetData, borderRadiusEnabled = true }) {
 	const links = widgetData?.links || [];
 
 	// Detect platform from URL and return appropriate colors
@@ -31,8 +33,9 @@ export default function LinksWidget({ widgetData }) {
 	// Empty state
 	if (links.length === 0) {
 		return (
-			<div className="italic text-center py-8" style={{ color: "var(--color-text-secondary)" }}>
-				Click "Edit" to add links to social media and websites
+			<div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+				<div className="text-gray-600 font-medium mb-1">No links added</div>
+				<div className="text-sm text-gray-500">Click Edit to add links to social media and websites</div>
 			</div>
 		);
 	}
@@ -46,17 +49,21 @@ export default function LinksWidget({ widgetData }) {
 					href={link.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="w-full py-3 px-4 rounded-lg text-left font-medium flex justify-between items-center transition-all hover:opacity-90 shadow-sm"
+					className={`button-link w-full py-3 px-4 text-left font-medium flex justify-between items-center transition-all hover:opacity-90 ${
+						borderRadiusEnabled ? "rounded-2xl" : "rounded-none"
+					}`}
 					style={{
 						backgroundColor: "var(--color-accent)",
 						color: "var(--color-widget)",
 					}}>
 					<span className="flex items-center gap-2">
-						<span>{link.label}</span>
+						<span style={{ color: "var(--color-widget)" }}>{link.label}</span>
 					</span>
-					<span>→</span>
+					<span style={{ color: "var(--color-widget)" }}>→</span>
 				</a>
 			))}
 		</div>
 	);
 }
+
+export default React.memo(LinksWidget);

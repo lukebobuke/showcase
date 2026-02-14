@@ -76,7 +76,7 @@ export const register = async (req, res) => {
 
 		if (existingEmail) {
 			return res.status(409).json({
-				error: "Email already exists",
+				error: "This email is already registered. Please use a different email or try logging in.",
 			});
 		}
 
@@ -87,7 +87,7 @@ export const register = async (req, res) => {
 
 		if (existingUsername) {
 			return res.status(409).json({
-				error: "Username already exists",
+				error: "Username already taken. Please choose a different username.",
 			});
 		}
 
@@ -163,7 +163,7 @@ export const login = async (req, res) => {
 		// 3. If user not found, return invalid credentials
 		if (!user) {
 			return res.status(401).json({
-				error: "Invalid credentials",
+				error: "Invalid email or password. Please try again.",
 			});
 		}
 
@@ -173,7 +173,7 @@ export const login = async (req, res) => {
 		// 5. If password doesn't match, return invalid credentials
 		if (!isPasswordValid) {
 			return res.status(401).json({
-				error: "Invalid credentials",
+				error: "Invalid email or password. Please try again.",
 			});
 		}
 

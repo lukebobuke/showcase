@@ -57,7 +57,7 @@ export const getPageByUsername = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("Error fetching page by username:", error);
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ error: "Unable to load page. Please try again." });
 	}
 };
 
@@ -89,7 +89,7 @@ export const getMyPage = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("Error fetching user page:", error);
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ error: "Unable to load your page. Please try again." });
 	}
 };
 
@@ -119,7 +119,7 @@ export const createPage = async (req, res) => {
 		res.status(201).json({ page });
 	} catch (error) {
 		console.error("Error creating page:", error);
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ error: "Unable to create page. Please try again." });
 	}
 };
 
@@ -146,6 +146,6 @@ export const updatePage = async (req, res) => {
 			return res.status(404).json({ error: "Page not found" });
 		}
 		console.error("Error updating page:", error);
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ error: "Unable to update page. Please try again." });
 	}
 };

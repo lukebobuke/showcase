@@ -24,14 +24,14 @@ export const authenticate = async (req, res, next) => {
 
 		if (!authHeader) {
 			return res.status(401).json({
-				error: "No token provided",
+				error: "Authentication required. Please log in.",
 			});
 		}
 
 		// 2. Check format (Bearer <token>)
 		if (!authHeader.startsWith("Bearer ")) {
 			return res.status(401).json({
-				error: "Invalid token format",
+				error: "Invalid authentication format. Please log in again.",
 			});
 		}
 
@@ -44,7 +44,7 @@ export const authenticate = async (req, res, next) => {
 			decoded = jwt.verify(token, process.env.JWT_SECRET);
 		} catch (err) {
 			return res.status(401).json({
-				error: "Invalid token",
+				error: "Invalid authentication token. Please log in again.",
 			});
 		}
 
@@ -58,7 +58,7 @@ export const authenticate = async (req, res, next) => {
 
 		if (!user) {
 			return res.status(401).json({
-				error: "User not found",
+				error: "User account not found. Please log in again.",
 			});
 		}
 
@@ -76,7 +76,7 @@ export const authenticate = async (req, res, next) => {
 	} catch (error) {
 		console.error("Authentication error:", error);
 		return res.status(500).json({
-			error: "Internal server error",
+			error: "Authentication failed. Please try again.",
 		});
 	}
 };

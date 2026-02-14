@@ -12,22 +12,31 @@ export default function WidgetList({
 	disabled,
 	newlyCreatedWidgetId,
 	onClearNewlyCreated,
+	borderRadiusEnabled = true,
+	borderEnabled = true,
+	borderThickness = 1,
+	marginsEnabled = true,
+	verticalSpacingEnabled = true,
+	fullBleedEnabled = true,
 }) {
+	const containerClassName = fullBleedEnabled ? "" : "-mx-8 w-[calc(100%+4rem)]";
 	// Empty state
 	if (!widgets || widgets.length === 0) {
 		return (
-			<div className="text-center py-12 px-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-				<p className="text-xl font-semibold mb-2 text-gray-700">No widgets yet</p>
-				{editMode ?
-					<p className="text-gray-600">Your page is empty. Click 'Add Widget' to get started!</p>
-				:	<p className="text-gray-600">No content on your page yet.</p>}
+			<div className={containerClassName}>
+				<div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+					<div className="text-gray-600 font-medium mb-1">No widgets on your page</div>
+					{editMode ?
+						<div className="text-sm text-gray-500">Click 'Add Widget' below to start building your page</div>
+					:	<div className="text-sm text-gray-500">Enter Edit Mode to add content to your page</div>}
+				</div>
 			</div>
 		);
 	}
 
 	// Render widgets
 	return (
-		<div>
+		<div className={containerClassName}>
 			{widgets.map((widget, index) => {
 				const isFirst = index === 0;
 				const isLast = index === widgets.length - 1;
@@ -46,6 +55,11 @@ export default function WidgetList({
 						disabled={disabled}
 						autoOpenEditor={widget.id === newlyCreatedWidgetId}
 						onEditorOpened={onClearNewlyCreated}
+						borderRadiusEnabled={borderRadiusEnabled}
+						borderEnabled={borderEnabled}
+						borderThickness={borderThickness}
+						marginsEnabled={marginsEnabled}
+						verticalSpacingEnabled={verticalSpacingEnabled}
 					/>
 				);
 			})}

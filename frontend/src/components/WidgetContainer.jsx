@@ -24,8 +24,14 @@ export default function WidgetContainer({
 	onUpdateWidget,
 	autoOpenEditor,
 	onEditorOpened,
+	borderRadiusEnabled,
+	borderEnabled,
+	borderThickness,
+	marginsEnabled,
+	verticalSpacingEnabled,
 }) {
 	const [showEditModal, setShowEditModal] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
 
 	// Auto-open editor for newly created widgets
 	useEffect(() => {
@@ -44,9 +50,14 @@ export default function WidgetContainer({
 		}
 	};
 
-	const handleSaveContent = (newData) => {
-		onUpdateWidget(widget.id, newData);
-		setShowEditModal(false);
+	const handleSaveContent = async (newData) => {
+		setIsSaving(true);
+		try {
+			await onUpdateWidget(widget.id, newData);
+			setShowEditModal(false);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	const renderWidgetContent = () => {
@@ -54,13 +65,21 @@ export default function WidgetContainer({
 			case "text":
 				return <TextWidget widgetData={widget.widgetData} editMode={editMode} />;
 			case "links":
-				return <LinksWidget widgetData={widget.widgetData} />;
+				return <LinksWidget widgetData={widget.widgetData} borderRadiusEnabled={borderRadiusEnabled} />;
 			case "photos":
-				return <PhotoAlbumWidget widgetData={widget.widgetData} />;
+				return <PhotoAlbumWidget widgetData={widget.widgetData} borderRadiusEnabled={borderRadiusEnabled} />;
 			case "youtube":
-				return <YouTubeWidget widgetData={widget.widgetData} />;
+				return <YouTubeWidget widgetData={widget.widgetData} borderRadiusEnabled={borderRadiusEnabled} />;
 			case "tour_dates":
-				return <TourDatesWidget widgetData={widget.widgetData} />;
+				return (
+					<TourDatesWidget
+						widgetData={widget.widgetData}
+						borderRadiusEnabled={borderRadiusEnabled}
+						borderEnabled={borderEnabled}
+						borderThickness={borderThickness}
+						verticalSpacingEnabled={verticalSpacingEnabled}
+					/>
+				);
 			default:
 				return <div>Unknown widget type</div>;
 		}
@@ -68,24 +87,16 @@ export default function WidgetContainer({
 
 	return (
 		<div
-			className="p-4 rounded-lg shadow mb-4 relative"
+			className={`${marginsEnabled ? "p-4" : "p-0"} ${verticalSpacingEnabled ? "mb-4" : "mb-0"} relative transition-all duration-300 ease-in-out ${
+				borderRadiusEnabled ? "rounded-2xl" : "rounded-none"
+			}`}
 			style={{
-				backgroundColor: "var(--color-widget)",
+				backgroundColor: marginsEnabled ? "var(--color-widget)" : "transparent",
 				borderColor: "var(--color-border)",
-				border: "1px solid",
+				border: borderEnabled ? `${borderThickness}px solid var(--color-border)` : "none",
 			}}>
-			{/* Widget type badge */}
-			<span
-				className="absolute top-2 right-2 px-2 py-1 rounded text-sm"
-				style={{
-					backgroundColor: "var(--color-border)",
-					color: "var(--color-text)",
-				}}>
-				{widget.widgetType}
-			</span>
-
 			{/* Widget content area */}
-			<div className="mt-6">{renderWidgetContent()}</div>
+			<div>{renderWidgetContent()}</div>
 
 			{/* Edit mode controls */}
 			{editMode && (
@@ -95,8 +106,8 @@ export default function WidgetContainer({
 						<button
 							onClick={onMoveUp}
 							disabled={disabled}
-							className={`px-2 py-1 text-white text-xs rounded ${
-								disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+							className={`px-2 py-1 text-white text-xs rounded transition-transform ${
+								disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 hover:scale-105"
 							}`}
 							title="Move up">
 							↑
@@ -108,8 +119,8 @@ export default function WidgetContainer({
 						<button
 							onClick={onMoveDown}
 							disabled={disabled}
-							className={`px-2 py-1 text-white text-xs rounded ${
-								disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+							className={`px-2 py-1 text-white text-xs rounded transition-transform ${
+								disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 hover:scale-105"
 							}`}
 							title="Move down">
 							↓
@@ -120,8 +131,8 @@ export default function WidgetContainer({
 					<button
 						onClick={() => setShowEditModal(true)}
 						disabled={disabled}
-						className={`px-2 py-1 text-white text-xs rounded ${
-							disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+						className={`px-2 py-1 text-white text-xs rounded transition-transform ${
+							disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 hover:scale-105"
 						}`}
 						title="Edit">
 						Edit
@@ -132,8 +143,8 @@ export default function WidgetContainer({
 						<button
 							onClick={handleDelete}
 							disabled={disabled}
-							className={`px-2 py-1 text-white text-xs rounded ${
-								disabled ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
+							className={`danger px-2 py-1 text-white text-xs rounded transition-transform ${
+								disabled ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 hover:scale-105"
 							}`}
 							title="Delete">
 							✕
@@ -141,7 +152,6 @@ export default function WidgetContainer({
 					)}
 				</div>
 			)}
-
 			{/* Edit Modal - Text Widget */}
 			{widget.widgetType === "text" && (
 				<TextWidgetEditor
@@ -149,6 +159,7 @@ export default function WidgetContainer({
 					initialContent={widget.widgetData?.content || ""}
 					onSave={(newContent) => handleSaveContent({ content: newContent })}
 					onClose={() => setShowEditModal(false)}
+					isSaving={isSaving}
 				/>
 			)}
 
@@ -159,6 +170,7 @@ export default function WidgetContainer({
 					initialLinks={widget.widgetData?.links || []}
 					onSave={(newData) => handleSaveContent(newData)}
 					onClose={() => setShowEditModal(false)}
+					isSaving={isSaving}
 				/>
 			)}
 
@@ -169,6 +181,7 @@ export default function WidgetContainer({
 					initialImages={widget.widgetData?.images || []}
 					onSave={(newData) => handleSaveContent(newData)}
 					onClose={() => setShowEditModal(false)}
+					isSaving={isSaving}
 				/>
 			)}
 
@@ -179,6 +192,7 @@ export default function WidgetContainer({
 					initialVideoUrl={widget.widgetData?.videoUrl || ""}
 					onSave={(newData) => handleSaveContent(newData)}
 					onClose={() => setShowEditModal(false)}
+					isSaving={isSaving}
 				/>
 			)}
 
@@ -189,6 +203,7 @@ export default function WidgetContainer({
 					initialDates={widget.widgetData?.dates || []}
 					onSave={(newData) => handleSaveContent(newData)}
 					onClose={() => setShowEditModal(false)}
+					isSaving={isSaving}
 				/>
 			)}
 		</div>

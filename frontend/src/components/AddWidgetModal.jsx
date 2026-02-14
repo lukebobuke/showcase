@@ -1,6 +1,25 @@
 /** @format */
 
-export default function AddWidgetModal({ isOpen, onClose, onAdd }) {
+import { useEffect } from "react";
+/**
+ * Modal for selecting and adding a new widget to the page
+ * Displays available widget types with descriptions
+ * @param {boolean} isOpen - Controls modal visibility
+ * @param {function} onClose - Callback when modal is closed
+ * @param {function} onSelectType - Callback when widget type is selected
+ */ export default function AddWidgetModal({ isOpen, onClose, onAdd }) {
+	// ESC key to close modal
+	useEffect(() => {
+		const handleEsc = (e) => {
+			if (e.key === "Escape") onClose();
+		};
+
+		if (isOpen) {
+			document.addEventListener("keydown", handleEsc);
+			return () => document.removeEventListener("keydown", handleEsc);
+		}
+	}, [isOpen, onClose]);
+
 	if (!isOpen) return null;
 
 	const widgetTypes = [
@@ -37,8 +56,8 @@ export default function AddWidgetModal({ isOpen, onClose, onAdd }) {
 	};
 
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
-			<div className="bg-white rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn" onClick={onClose}>
+			<div className="bg-white rounded-lg p-6 max-w-md w-full animate-modalSlideIn" onClick={(e) => e.stopPropagation()}>
 				{/* Header with title and close button */}
 				<div className="flex justify-between items-center mb-4">
 					<h2 className="text-xl font-bold">Add Widget</h2>
@@ -53,7 +72,7 @@ export default function AddWidgetModal({ isOpen, onClose, onAdd }) {
 						<button
 							key={widget.type}
 							onClick={() => handleWidgetClick(widget.type)}
-							className="w-full text-left p-4 border rounded mb-2 hover:bg-blue-50 transition-colors">
+							className="w-full text-left p-4 border rounded mb-2 hover:bg-blue-50 transition-all hover:scale-105">
 							<div className="font-semibold text-gray-900">{widget.label}</div>
 							<div className="text-sm text-gray-600">{widget.description}</div>
 						</button>

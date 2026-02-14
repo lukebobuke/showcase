@@ -44,26 +44,44 @@ export default function PublicPage() {
 		};
 	}, [page, applyTheme]);
 
+	// Set dynamic meta title for SEO
+	useEffect(() => {
+		if (user && page) {
+			document.title = `${user.username} | Musician Landing Page`;
+		}
+
+		// Cleanup: reset to default title when leaving page
+		return () => {
+			document.title = "Musician Landing Pages";
+		};
+	}, [user, page]);
+
 	if (loading) {
 		return (
-			<div className="max-w-4xl mx-auto p-8">
-				<p>Loading...</p>
+			<div className="flex items-center justify-center min-h-screen">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+					<p className="text-gray-600">Loading page...</p>
+				</div>
 			</div>
 		);
 	}
 
 	if (error) {
 		return (
-			<div className="max-w-4xl mx-auto p-8">
-				<p>Page not found</p>
+			<div className="flex items-center justify-center min-h-screen">
+				<div className="text-center">
+					<div className="text-6xl mb-4">404</div>
+					<h1 className="text-2xl font-bold mb-2">Page not found</h1>
+					<p className="text-gray-600">The page you're looking for doesn't exist.</p>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="max-w-4xl mx-auto p-8">
+		<div className="theme-scope max-w-4xl mx-auto p-8">
 			<h1 className="text-3xl font-bold mb-4">{user?.username}</h1>
-			<p className="text-gray-600 mb-8">Theme: {page?.theme}</p>
 			<WidgetList widgets={page.widgets || []} editMode={false} />
 		</div>
 	);

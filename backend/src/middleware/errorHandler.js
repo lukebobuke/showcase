@@ -16,32 +16,44 @@ function handlePrismaError(err) {
 		case "P2002":
 			// Unique constraint violation
 			const field = err.meta?.target?.[0] || "field";
+			// Provide user-friendly messages for specific fields
+			if (field === "email") {
+				return {
+					status: 409,
+					message: "This email is already registered. Please use a different email or try logging in.",
+				};
+			} else if (field === "username") {
+				return {
+					status: 409,
+					message: "Username already taken. Please choose a different username.",
+				};
+			}
 			return {
 				status: 409,
-				message: `A record with this ${field} already exists`,
+				message: `This ${field} is already taken. Please try a different one.`,
 			};
 		case "P2025":
 			// Record not found
 			return {
 				status: 404,
-				message: "Record not found",
+				message: "The requested item could not be found.",
 			};
 		case "P2003":
 			// Foreign key constraint failed
 			return {
 				status: 400,
-				message: "Invalid reference to related record",
+				message: "Invalid data reference. Please check your input.",
 			};
 		case "P2014":
 			// Invalid ID
 			return {
 				status: 400,
-				message: "Invalid ID provided",
+				message: "Invalid ID provided. Please try again.",
 			};
 		default:
 			return {
 				status: 500,
-				message: "Database error occurred",
+				message: "Something went wrong. Please try again.",
 			};
 	}
 }
@@ -81,12 +93,12 @@ export const errorHandler = (err, req, res, next) => {
 	// Handle JWT errors
 	if (err.name === "JsonWebTokenError") {
 		statusCode = 401;
-		message = "Invalid token";
+		message = "Invalid authentication token. Please log in again.";
 	}
 
 	if (err.name === "TokenExpiredError") {
 		statusCode = 401;
-		message = "Token expired";
+		message = "Your session has expired. Please log in again.";
 	}
 
 	// Send error response

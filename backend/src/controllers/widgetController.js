@@ -53,7 +53,7 @@ export const createWidget = async (req, res) => {
 		return res.status(201).json({ widget });
 	} catch (error) {
 		console.error("Error creating widget:", error);
-		return res.status(500).json({ error: "Failed to create widget" });
+		return res.status(500).json({ error: "Failed to create widget. Please try again." });
 	}
 };
 
@@ -94,7 +94,7 @@ export const updateWidget = async (req, res) => {
 		return res.status(200).json({ widget: updatedWidget });
 	} catch (error) {
 		console.error("Error updating widget:", error);
-		return res.status(500).json({ error: "Failed to update widget" });
+		return res.status(500).json({ error: "Failed to save widget. Please try again." });
 	}
 };
 
@@ -147,7 +147,7 @@ export const deleteWidget = async (req, res) => {
 		return res.status(200).json({ success: true });
 	} catch (error) {
 		console.error("Error deleting widget:", error);
-		return res.status(500).json({ error: "Failed to delete widget" });
+		return res.status(500).json({ error: "Failed to delete widget. Please try again." });
 	}
 };
 

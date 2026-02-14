@@ -6,8 +6,9 @@ import { useAuth } from "../context/AuthContext";
 import { usePage } from "../context/PageContext";
 import { useTheme } from "../context/ThemeContext";
 import WidgetList from "../components/WidgetList";
-import ThemeSelector from "../components/ThemeSelector";
+import UserSettings from "../components/UserSettings";
 import AddWidgetModal from "../components/AddWidgetModal";
+import Toast from "../components/Toast";
 
 export default function DashboardPage() {
 	const { user, token, logout } = useAuth();
@@ -19,6 +20,13 @@ export default function DashboardPage() {
 	const [operationLoading, setOperationLoading] = useState(false);
 	const [newlyCreatedWidgetId, setNewlyCreatedWidgetId] = useState(null);
 	const [error, setError] = useState(null);
+	const [toast, setToast] = useState(null);
+	const [marginsEnabled, setMarginsEnabled] = useState(true);
+	const [borderRadiusEnabled, setBorderRadiusEnabled] = useState(true);
+	const [borderEnabled, setBorderEnabled] = useState(true);
+	const [borderThickness, setBorderThickness] = useState(1);
+	const [verticalSpacingEnabled, setVerticalSpacingEnabled] = useState(true);
+	const [fullBleedEnabled, setFullBleedEnabled] = useState(true);
 
 	useEffect(() => {
 		if (token) {
@@ -44,10 +52,13 @@ export default function DashboardPage() {
 		}
 	}, [error]);
 
+	const showToast = (message, type = "success") => {
+		setToast({ message, type });
+	};
+
 	const handleThemeChange = async (newTheme) => {
 		try {
 			await updateTheme(token, newTheme);
-			// Theme updates immediately via PageContext
 		} catch (error) {
 			console.error("Error changing theme:", error);
 			setError(error.message || "Failed to update theme. Please try again.");
@@ -67,7 +78,7 @@ export default function DashboardPage() {
 			setShowAddModal(false);
 			// Store the newly created widget ID to auto-open its editor
 			setNewlyCreatedWidgetId(widget.widget.id);
-			alert("Widget added!");
+			showToast("Widget added successfully!");
 		} catch (err) {
 			console.error("Error adding widget:", err);
 			setError(err.message || "Failed to add widget. Please try again.");
@@ -81,7 +92,7 @@ export default function DashboardPage() {
 		setError(null);
 		try {
 			await removeWidget(token, widgetId);
-			alert("Widget deleted!");
+			showToast("Widget deleted successfully!");
 		} catch (err) {
 			console.error("Error deleting widget:", err);
 			setError(err.message || "Failed to delete widget. Please try again.");
@@ -90,6 +101,7 @@ export default function DashboardPage() {
 		}
 	};
 
+	// Move widget up in order (swap with previous)
 	const handleMoveUp = async (index) => {
 		if (index === 0) return; // Can't move up if already first
 
@@ -100,7 +112,6 @@ export default function DashboardPage() {
 			[newWidgets[index], newWidgets[index - 1]] = [newWidgets[index - 1], newWidgets[index]];
 			const widgetIds = newWidgets.map((w) => w.id);
 			await reorderPageWidgets(token, widgetIds);
-			console.log("Widget reordered successfully");
 		} catch (err) {
 			console.error("Error reordering widgets:", err);
 			setError(err.message || "Failed to reorder widgets. Please try again.");
@@ -109,6 +120,7 @@ export default function DashboardPage() {
 		}
 	};
 
+	// Move widget down in order (swap with next)
 	const handleMoveDown = async (index) => {
 		if (index === page.widgets.length - 1) return; // Can't move down if already last
 
@@ -119,7 +131,6 @@ export default function DashboardPage() {
 			[newWidgets[index], newWidgets[index + 1]] = [newWidgets[index + 1], newWidgets[index]];
 			const widgetIds = newWidgets.map((w) => w.id);
 			await reorderPageWidgets(token, widgetIds);
-			console.log("Widget reordered successfully");
 		} catch (err) {
 			console.error("Error reordering widgets:", err);
 			setError(err.message || "Failed to reorder widgets. Please try again.");
@@ -133,7 +144,7 @@ export default function DashboardPage() {
 		setError(null);
 		try {
 			await updateWidgetData(token, widgetId, newData);
-			alert("Widget updated!");
+			showToast("Widget updated successfully!");
 		} catch (err) {
 			console.error("Error updating widget:", err);
 			setError(err.message || "Failed to update widget. Please try again.");
@@ -144,54 +155,83 @@ export default function DashboardPage() {
 
 	if (loading) {
 		return (
-			<div>
-				<p>Loading page data...</p>
+			<div className="flex items-center justify-center min-h-screen">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+					<p className="text-gray-600">Loading your dashboard...</p>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div>
-			<h1 className="text-2xl font-bold mb-4">Welcome, {user?.username}!</h1>
-			<p className="mb-4">Email: {user?.email}</p>
-
+		<div className="theme-scope">
 			{/* Error message banner */}
 			{error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
-			<div className="mb-4">
-				<p className="text-gray-700">
-					Current theme: <span className="font-semibold">{page?.theme || "Not set"}</span>
-				</p>
-			</div>
-
-			{editMode && (
-				<div className="mb-4">
-					<ThemeSelector currentTheme={page?.theme || "ocean-light"} onThemeChange={handleThemeChange} />
-				</div>
-			)}
-
-			<div className="mb-4">
-				<button
-					onClick={toggleEditMode}
-					className={`px-4 py-2 rounded ${
-						editMode ? "bg-gray-600 text-white hover:bg-gray-700" : "bg-blue-600 text-white hover:bg-blue-700"
-					}`}>
-					{editMode ? "Exit Edit Mode" : "Enter Edit Mode"}
-				</button>
-				<span className="ml-4 text-gray-600">
-					{page?.widgets?.length || 0} widget{page?.widgets?.length === 1 ? "" : "s"}
-				</span>
-			</div>
-
-			<div className="mb-4">
-				<Link to={`/${user?.username}`} className="text-blue-600 hover:underline">
+			{/* Band 1: Welcome */}
+			<div className="mb-8 pb-6 border-b-2" style={{ borderColor: "var(--color-border)" }}>
+				<h1 className="text-3xl font-bold mb-2">Welcome, {user?.username || "User"}!</h1>
+				<p className="mb-4">{user?.email}</p>
+				<Link to={`/${user?.username}`} className="theme-button inline-block px-4 py-2 rounded transition-transform hover:scale-105">
 					View your page
 				</Link>
 			</div>
 
+			{/* Band 2: Settings */}
+			<div className="mb-8 pb-6 border-b-2" style={{ borderColor: "var(--color-border)" }}>
+				<h2 className="text-2xl font-bold mb-4">Settings</h2>
+				<UserSettings
+					currentTheme={page?.theme || "ocean-light"}
+					onThemeChange={handleThemeChange}
+					marginsEnabled={marginsEnabled}
+					onToggleMargins={() => {
+						setMarginsEnabled((prev) => {
+							const next = !prev;
+							if (!next) {
+								setBorderEnabled(false);
+							}
+							return next;
+						});
+					}}
+					borderRadiusEnabled={borderRadiusEnabled}
+					onToggleBorderRadius={() => setBorderRadiusEnabled((prev) => !prev)}
+					borderEnabled={borderEnabled}
+					onToggleBorder={() => setBorderEnabled((prev) => !prev)}
+					borderThickness={borderThickness}
+					onBorderThicknessChange={setBorderThickness}
+					verticalSpacingEnabled={verticalSpacingEnabled}
+					onToggleVerticalSpacing={() => setVerticalSpacingEnabled((prev) => !prev)}
+					fullBleedEnabled={fullBleedEnabled}
+					onToggleFullBleed={() => setFullBleedEnabled((prev) => !prev)}
+				/>
+			</div>
+
+			{/* Band 3: Your Widgets */}
 			<div className="mb-8">
-				<h2 className="text-xl font-semibold mb-4">Your Widgets</h2>
-				{operationLoading && <p className="text-blue-600 mb-2">Processing...</p>}
+				<h2 className="text-2xl font-bold mb-4">Your Widgets</h2>
+				<div className="mb-4">
+					<button
+						onClick={toggleEditMode}
+						className={`px-4 py-2 rounded transition-transform hover:scale-105 ${
+							editMode ? "bg-gray-600 text-white hover:bg-gray-700" : "theme-button"
+						}`}>
+						{editMode ? "Exit Edit Mode" : "Enter Edit Mode"}
+					</button>
+				</div>
+				{editMode && (
+					<button
+						onClick={() => setShowAddModal(true)}
+						disabled={operationLoading}
+						className={`px-4 py-2 rounded mb-4 transition-transform ${
+							operationLoading ?
+								"bg-gray-400 text-gray-200 cursor-not-allowed"
+							:	"bg-green-600 text-white hover:bg-green-700 hover:scale-105"
+						}`}>
+						{operationLoading ? "Processing..." : "Add Widget"}
+					</button>
+				)}
+				{operationLoading && <p className="mb-2">Processing...</p>}
 				<WidgetList
 					widgets={page?.widgets || []}
 					editMode={editMode}
@@ -202,24 +242,27 @@ export default function DashboardPage() {
 					disabled={operationLoading}
 					newlyCreatedWidgetId={newlyCreatedWidgetId}
 					onClearNewlyCreated={() => setNewlyCreatedWidgetId(null)}
+					borderRadiusEnabled={borderRadiusEnabled}
+					borderEnabled={borderEnabled}
+					borderThickness={borderThickness}
+					marginsEnabled={marginsEnabled}
+					verticalSpacingEnabled={verticalSpacingEnabled}
+					fullBleedEnabled={fullBleedEnabled}
 				/>
-				{editMode && (
-					<button
-						onClick={() => setShowAddModal(true)}
-						disabled={operationLoading}
-						className={`px-4 py-2 rounded mt-4 ${
-							operationLoading ? "bg-gray-400 text-gray-200 cursor-not-allowed" : "bg-green-600 text-white hover:bg-green-700"
-						}`}>
-						{operationLoading ? "Processing..." : "Add Widget"}
-					</button>
-				)}
 			</div>
 
 			<AddWidgetModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onAdd={handleAddWidget} />
 
-			<button onClick={handleLogout} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-				Logout
-			</button>
+			{/* Toast Notification */}
+			{toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+			<div className="flex justify-center mt-8">
+				<button
+					onClick={handleLogout}
+					className="danger bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-transform hover:scale-105">
+					Logout
+				</button>
+			</div>
 		</div>
 	);
 }

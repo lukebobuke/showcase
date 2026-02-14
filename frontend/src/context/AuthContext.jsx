@@ -2,13 +2,33 @@
 
 import { createContext, useState, useEffect, useContext } from "react";
 import * as api from "../services/api";
-
-const AuthContext = createContext();
+/**
+ * Authentication context providing user state and auth operations
+ * Manages JWT token storage and automatic session verification
+ */ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
 	const [user, setUser] = useState(null);
 	const [token, setToken] = useState(null);
 	const [loading, setLoading] = useState(true);
+
+	const logout = () => {
+		setUser(null);
+		setToken(null);
+		localStorage.removeItem("token");
+	};
+
+	const getCurrentUser = async (authToken) => {
+		try {
+			const userData = await api.getCurrentUser(authToken);
+			return userData.user;
+		} catch (error) {
+			// Token invalid/expired - auto-logout
+			console.error("Token expired or invalid:", error);
+			logout();
+			return null;
+		}
+	};
 
 	// Load token from localStorage on mount
 	useEffect(() => {
@@ -17,13 +37,9 @@ export function AuthProvider({ children }) {
 
 			if (storedToken) {
 				setToken(storedToken);
-				try {
-					const userData = await api.getCurrentUser(storedToken);
-					setUser(userData.user);
-				} catch (error) {
-					console.error("Error loading user:", error);
-					localStorage.removeItem("token");
-					setToken(null);
+				const userData = await getCurrentUser(storedToken);
+				if (userData) {
+					setUser(userData);
 				}
 			}
 
@@ -67,12 +83,6 @@ export function AuthProvider({ children }) {
 		}
 	};
 
-	const logout = () => {
-		setUser(null);
-		setToken(null);
-		localStorage.removeItem("token");
-	};
-
 	const value = {
 		user,
 		token,
@@ -80,6 +90,7 @@ export function AuthProvider({ children }) {
 		login,
 		register,
 		logout,
+		getCurrentUser,
 	};
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

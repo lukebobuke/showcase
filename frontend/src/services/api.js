@@ -2,6 +2,8 @@
 
 import axios from "axios";
 
+// API endpoint URLs - hardcoded for development
+// TODO: Replace with environment variables for production deployment
 const API_URL = "http://localhost:5000/api/auth";
 const PAGES_API_URL = "http://localhost:5000/api/pages";
 const WIDGETS_API_URL = "http://localhost:5000/api/widgets";
@@ -15,7 +17,8 @@ export async function register(username, email, password) {
 		});
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Something went wrong. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -27,7 +30,8 @@ export async function login(email, password) {
 		});
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Something went wrong. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -40,7 +44,8 @@ export async function getCurrentUser(token) {
 		});
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Something went wrong. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -50,7 +55,8 @@ export async function getPageByUsername(username) {
 		const response = await axios.get(`${PAGES_API_URL}/${username}`);
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Something went wrong. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -63,7 +69,8 @@ export async function getMyPage(token) {
 		});
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Something went wrong. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -80,7 +87,8 @@ export async function updatePage(token, theme, headerImage) {
 		);
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Something went wrong. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -98,7 +106,8 @@ export async function createWidget(token, widgetType, widgetData) {
 		);
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Failed to create widget. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -115,7 +124,8 @@ export async function updateWidget(token, widgetId, widgetData) {
 		);
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Failed to save widget. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -128,7 +138,8 @@ export async function deleteWidget(token, widgetId) {
 		});
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Failed to delete widget. Please try again.";
+		throw new Error(message);
 	}
 }
 
@@ -145,6 +156,7 @@ export async function reorderWidgets(token, widgetIds) {
 		);
 		return response.data;
 	} catch (error) {
-		throw error;
+		const message = error.response?.data?.error || error.message || "Failed to reorder widgets. Please try again.";
+		throw new Error(message);
 	}
 }

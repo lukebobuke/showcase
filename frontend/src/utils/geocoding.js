@@ -18,7 +18,7 @@ export async function geocodeCity(city) {
 		// Nominatim requires a User-Agent header
 		const response = await fetch(url, {
 			headers: {
-				"User-Agent": "ShowcaseApp/1.0 (showcase-widget-app)",
+				"User-Agent": "ShowcaseApp/1.0 (showcase-widget-app)", // Required by Nominatim
 			},
 		});
 

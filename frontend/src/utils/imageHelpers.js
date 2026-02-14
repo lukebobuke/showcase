@@ -34,7 +34,7 @@ export function validateImage(file) {
 	if (file.size > maxSize) {
 		return {
 			valid: false,
-			error: "Image must be smaller than 2MB",
+			error: "Image too large. Max 2MB per image.",
 		};
 	}
 
@@ -54,11 +54,8 @@ export function compressImage(base64, maxWidth = 800, onProgress = null) {
 		const img = new Image();
 
 		img.onload = () => {
-			// Check original size and warn if > 5MB
-			const originalSize = Math.round((base64.length * 3) / 4); // Approximate size
-			if (originalSize > 5 * 1024 * 1024) {
-				console.warn(`Original image is ${(originalSize / (1024 * 1024)).toFixed(2)}MB. This may take a moment to compress.`);
-			}
+			// Calculate approximate original size for optimization logic
+			const originalSize = Math.round((base64.length * 3) / 4);
 
 			if (onProgress) onProgress(20);
 
@@ -84,19 +81,34 @@ export function compressImage(base64, maxWidth = 800, onProgress = null) {
 
 			if (onProgress) onProgress(60);
 
-			// Target max file size: 200KB
+			// Target max file size: 200KB (conservative target)
 			const targetSize = 200 * 1024; // 200KB in bytes
-			let quality = 0.9; // Start with high quality
+			const strictTarget = 190 * 1024; // 190KB for safety margin
+
+			let quality = 0.8; // Start with 80% quality as specified
 			let compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+			let currentSize = Math.round((compressedBase64.length * 3) / 4);
 			let attempts = 0;
-			const maxAttempts = 5;
+			const maxAttempts = 10; // More attempts to reach target
 
 			if (onProgress) onProgress(70);
 
 			// Iteratively reduce quality if file is still too large
-			while (compressedBase64.length > targetSize && quality > 0.7 && attempts < maxAttempts) {
-				quality -= 0.05; // Reduce quality by 5%
+			while (currentSize > strictTarget && quality > 0.5 && attempts < maxAttempts) {
+				// Aggressive quality reduction if file is much larger than target
+				if (currentSize > targetSize * 2) {
+					quality -= 0.1; // Reduce by 10% if much too large
+				} else if (currentSize > targetSize * 1.5) {
+					quality -= 0.05; // Reduce by 5% if moderately too large
+				} else {
+					quality -= 0.02; // Fine-tune if close to target
+				}
+
+				// Don't go below minimum quality
+				quality = Math.max(0.5, quality);
+
 				compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+				currentSize = Math.round((compressedBase64.length * 3) / 4);
 				attempts++;
 
 				if (onProgress) {
@@ -105,9 +117,17 @@ export function compressImage(base64, maxWidth = 800, onProgress = null) {
 				}
 			}
 
-			// Log final size for debugging
-			const finalSize = Math.round((compressedBase64.length * 3) / 4);
-			console.log(`Compressed image: ${(finalSize / 1024).toFixed(2)}KB at ${(quality * 100).toFixed(0)}% quality`);
+			// If still too large, try more aggressive resize (fallback)
+			if (currentSize > targetSize && width > 600) {
+				const scaleFactor = 0.8;
+				canvas.width = Math.floor(width * scaleFactor);
+				canvas.height = Math.floor(height * scaleFactor);
+				ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+				compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+				currentSize = Math.round((compressedBase64.length * 3) / 4);
+			}
+
+			// TODO: Add user notification if compression fails to reach target size
 
 			if (onProgress) onProgress(100);
 

@@ -1,6 +1,8 @@
 /** @format */
 
-export default function TextWidget({ widgetData, editMode }) {
+import React from "react";
+
+function TextWidget({ widgetData, editMode }) {
 	const content = widgetData?.content || "";
 
 	// Edit mode - show textarea
@@ -15,7 +17,7 @@ export default function TextWidget({ widgetData, editMode }) {
 					style={{
 						borderColor: "var(--color-border)",
 						color: "var(--color-text)",
-						border: "1px solid",
+						border: "none",
 					}}
 				/>
 			</div>
@@ -25,8 +27,9 @@ export default function TextWidget({ widgetData, editMode }) {
 	// View mode - show content
 	if (!content) {
 		return (
-			<div className="italic text-center py-8" style={{ color: "var(--color-text-secondary)" }}>
-				Click "Edit" to add text to your page
+			<div className="p-8 text-center">
+				<div className="text-gray-600 font-medium mb-1">No text content</div>
+				<div className="text-sm text-gray-500">Click Edit to add text to your page</div>
 			</div>
 		);
 	}
@@ -37,3 +40,6 @@ export default function TextWidget({ widgetData, editMode }) {
 		</p>
 	);
 }
+
+// Prevent unnecessary re-renders
+export default React.memo(TextWidget);

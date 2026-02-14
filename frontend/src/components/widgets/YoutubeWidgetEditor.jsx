@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { extractVideoId, getEmbedUrl } from "../../utils/youtubeHelpers";
 
-export default function YouTubeWidgetEditor({ isOpen, initialVideoUrl, onSave, onClose }) {
+export default function YouTubeWidgetEditor({ isOpen, initialVideoUrl, onSave, onClose, isSaving }) {
 	const [videoUrl, setVideoUrl] = useState("");
 	const [previewVideoId, setPreviewVideoId] = useState(null);
 	const [error, setError] = useState("");
@@ -16,6 +16,18 @@ export default function YouTubeWidgetEditor({ isOpen, initialVideoUrl, onSave, o
 			setError("");
 		}
 	}, [isOpen, initialVideoUrl]);
+
+	// ESC key to close modal
+	useEffect(() => {
+		const handleEsc = (e) => {
+			if (e.key === "Escape") onClose();
+		};
+
+		if (isOpen) {
+			document.addEventListener("keydown", handleEsc);
+			return () => document.removeEventListener("keydown", handleEsc);
+		}
+	}, [isOpen, onClose]);
 
 	// Handle URL change
 	const handleUrlChange = (url) => {
@@ -33,7 +45,9 @@ export default function YouTubeWidgetEditor({ isOpen, initialVideoUrl, onSave, o
 	};
 
 	// Handle save
-	const handleSave = () => {
+	const handleSave = (e) => {
+		if (e) e.preventDefault();
+
 		if (!previewVideoId) {
 			setError("Please enter a valid YouTube URL");
 			return;
@@ -46,64 +60,72 @@ export default function YouTubeWidgetEditor({ isOpen, initialVideoUrl, onSave, o
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-			<div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+			<div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-modalSlideIn">
 				<h2 className="text-2xl font-bold mb-4">Edit YouTube Video</h2>
 
-				{/* Instructions */}
-				<p className="text-sm text-gray-600 mb-4">Paste any YouTube video URL</p>
+				<form onSubmit={handleSave}>
+					{/* Instructions */}
+					<p className="text-sm text-gray-600 mb-4">Paste any YouTube video URL</p>
 
-				{/* URL Input */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium mb-2">YouTube URL</label>
-					<input
-						type="text"
-						value={videoUrl}
-						onChange={(e) => handleUrlChange(e.target.value)}
-						placeholder="https://www.youtube.com/watch?v=..."
-						className={`w-full p-2 border rounded ${error ? "border-red-400" : "border-gray-300"}`}
-					/>
-					{error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-				</div>
-
-				{/* Live Preview */}
-				{previewVideoId && (
+					{/* URL Input */}
 					<div className="mb-4">
-						<label className="block text-sm font-medium mb-2">Preview</label>
-						<div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-							<iframe
-								className="absolute top-0 left-0 w-full h-full rounded"
-								src={getEmbedUrl(previewVideoId)}
-								frameBorder="0"
-								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-								allowFullScreen
-								title="YouTube video preview"
-							/>
+						<label className="block text-sm font-medium mb-2">YouTube URL</label>
+						<input
+							type="text"
+							value={videoUrl}
+							onChange={(e) => handleUrlChange(e.target.value)}
+							placeholder="https://www.youtube.com/watch?v=..."
+							className={`w-full p-2 border rounded ${error ? "border-red-400" : "border-gray-300"}`}
+						/>
+						{error && <p className="text-red-600 text-sm mt-1">{error}</p>}
+					</div>
+
+					{/* Live Preview */}
+					{previewVideoId && (
+						<div className="mb-4">
+							<label className="block text-sm font-medium mb-2">Preview</label>
+							<div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+								<iframe
+									className="absolute top-0 left-0 w-full h-full rounded"
+									src={getEmbedUrl(previewVideoId)}
+									frameBorder="0"
+									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+									allowFullScreen
+									title="YouTube video preview"
+								/>
+							</div>
 						</div>
-					</div>
-				)}
+					)}
 
-				{/* No preview placeholder */}
-				{videoUrl && !previewVideoId && (
-					<div className="mb-4 bg-gray-100 border border-gray-300 rounded-lg p-8 text-center">
-						<div className="text-gray-500 italic">Invalid YouTube URL - no preview available</div>
-					</div>
-				)}
+					{/* No preview placeholder */}
+					{videoUrl && !previewVideoId && (
+						<div className="mb-4 bg-gray-100 border border-gray-300 rounded-lg p-8 text-center">
+							<div className="text-gray-500 italic">Invalid YouTube URL - no preview available</div>
+						</div>
+					)}
 
-				{/* Cancel and Save buttons */}
-				<div className="flex justify-end gap-2">
-					<button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-						Cancel
-					</button>
-					<button
-						onClick={handleSave}
-						disabled={!previewVideoId}
-						className={`px-4 py-2 rounded ${
-							previewVideoId ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"
-						}`}>
-						Save
-					</button>
-				</div>
+					{/* Cancel and Save buttons */}
+					<div className="flex justify-end gap-2">
+						<button
+							type="button"
+							onClick={onClose}
+							disabled={isSaving}
+							className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:bg-gray-400 transition-transform hover:scale-105 disabled:hover:scale-100">
+							Cancel
+						</button>
+						<button
+							type="submit"
+							disabled={!previewVideoId || isSaving}
+							className={`px-4 py-2 rounded transition-transform ${
+								previewVideoId && !isSaving ?
+									"bg-blue-600 text-white hover:bg-blue-700 hover:scale-105"
+								:	"bg-gray-300 text-gray-500 cursor-not-allowed"
+							}`}>
+							{isSaving ? "Saving..." : "Save"}
+						</button>
+					</div>
+				</form>
 			</div>
 		</div>
 	);
