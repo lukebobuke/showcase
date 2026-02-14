@@ -11,7 +11,12 @@ export default function TextWidget({ widgetData, editMode }) {
 					value={content}
 					readOnly
 					placeholder="No text yet"
-					className="w-full p-2 border rounded min-h-32 text-base leading-relaxed"
+					className="w-full p-2 rounded min-h-32 text-base leading-relaxed"
+					style={{
+						borderColor: "var(--color-border)",
+						color: "var(--color-text)",
+						border: "1px solid",
+					}}
 				/>
 			</div>
 		);
@@ -19,8 +24,16 @@ export default function TextWidget({ widgetData, editMode }) {
 
 	// View mode - show content
 	if (!content) {
-		return <div className="text-gray-400 italic text-center py-8">Click "Edit" to add text to your page</div>;
+		return (
+			<div className="italic text-center py-8" style={{ color: "var(--color-text-secondary)" }}>
+				Click "Edit" to add text to your page
+			</div>
+		);
 	}
 
-	return <p className="text-base leading-relaxed">{content}</p>;
+	return (
+		<p className="text-base leading-relaxed" style={{ color: "var(--color-text)" }}>
+			{content}
+		</p>
+	);
 }

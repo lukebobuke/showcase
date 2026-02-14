@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getPageByUsername } from "../services/api";
 import WidgetList from "../components/WidgetList";
+import { useTheme } from "../context/ThemeContext";
 
 export default function PublicPage() {
 	const { username } = useParams();
@@ -11,6 +12,7 @@ export default function PublicPage() {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
+	const { applyTheme } = useTheme();
 
 	useEffect(() => {
 		const fetchPage = async () => {
@@ -30,6 +32,17 @@ export default function PublicPage() {
 
 		fetchPage();
 	}, [username]);
+
+	// Apply theme when page data is loaded
+	useEffect(() => {
+		const theme = page?.theme || "ocean-light";
+		applyTheme(theme);
+
+		// Cleanup: reset to default theme when leaving page
+		return () => {
+			applyTheme("ocean-light");
+		};
+	}, [page, applyTheme]);
 
 	if (loading) {
 		return (

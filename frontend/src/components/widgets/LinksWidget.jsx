@@ -30,7 +30,11 @@ export default function LinksWidget({ widgetData }) {
 
 	// Empty state
 	if (links.length === 0) {
-		return <div className="text-gray-400 italic text-center py-8">Click "Edit" to add links to social media and websites</div>;
+		return (
+			<div className="italic text-center py-8" style={{ color: "var(--color-text-secondary)" }}>
+				Click "Edit" to add links to social media and websites
+			</div>
+		);
 	}
 
 	// Render links as clickable buttons
@@ -42,7 +46,11 @@ export default function LinksWidget({ widgetData }) {
 					href={link.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className={`w-full ${getPlatformColors(link.url)} text-white py-3 px-4 rounded-lg text-left font-medium flex justify-between items-center transition-all hover:scale-105 shadow-sm`}>
+					className="w-full py-3 px-4 rounded-lg text-left font-medium flex justify-between items-center transition-all hover:opacity-90 shadow-sm"
+					style={{
+						backgroundColor: "var(--color-accent)",
+						color: "var(--color-widget)",
+					}}>
 					<span className="flex items-center gap-2">
 						<span>{link.label}</span>
 					</span>

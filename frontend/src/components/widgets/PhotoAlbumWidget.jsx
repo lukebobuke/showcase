@@ -10,10 +10,19 @@ export default function PhotoAlbumWidget({ widgetData }) {
 	// Empty state
 	if (images.length === 0) {
 		return (
-			<div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+			<div
+				className="border-2 border-dashed rounded-lg p-8 text-center"
+				style={{
+					borderColor: "var(--color-border)",
+					color: "var(--color-text)",
+				}}>
 				<div className="text-4xl mb-2">📷</div>
-				<div className="text-gray-600 font-medium mb-1">No photos yet</div>
-				<div className="text-gray-500 text-sm">Click Edit to add photos to your gallery</div>
+				<div className="font-medium mb-1" style={{ color: "var(--color-text)" }}>
+					No photos yet
+				</div>
+				<div className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+					Click Edit to add photos to your gallery
+				</div>
 			</div>
 		);
 	}

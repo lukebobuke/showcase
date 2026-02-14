@@ -15,10 +15,19 @@ export default function TourDatesWidget({ widgetData }) {
 	// Empty state
 	if (dates.length === 0) {
 		return (
-			<div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+			<div
+				className="border-2 border-dashed rounded-lg p-8 text-center"
+				style={{
+					borderColor: "var(--color-border)",
+					color: "var(--color-text)",
+				}}>
 				<div className="text-4xl mb-2">🗺️</div>
-				<div className="text-gray-600 font-medium mb-1">No tour dates yet</div>
-				<div className="text-gray-500 text-sm">Click Edit to add your upcoming shows</div>
+				<div className="font-medium mb-1" style={{ color: "var(--color-text)" }}>
+					No tour dates yet
+				</div>
+				<div className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+					Click Edit to add your upcoming shows
+				</div>
 			</div>
 		);
 	}
@@ -30,7 +39,7 @@ export default function TourDatesWidget({ widgetData }) {
 		<div>
 			{/* Date count header */}
 			<div className="mb-4">
-				<h3 className="text-lg font-semibold text-gray-900">
+				<h3 className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
 					{dates.length} {dates.length === 1 ? "show" : "shows"}
 				</h3>
 			</div>
@@ -41,7 +50,14 @@ export default function TourDatesWidget({ widgetData }) {
 			{/* Tour dates list */}
 			<div className="space-y-3">
 				{sortedDates.map((tourDate, index) => (
-					<div key={index} className="bg-white p-4 rounded-lg border hover:shadow transition-shadow">
+					<div
+						key={index}
+						className="p-4 rounded-lg hover:shadow transition-shadow"
+						style={{
+							backgroundColor: "var(--color-widget)",
+							borderColor: "var(--color-border)",
+							border: "1px solid",
+						}}>
 						<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 							<div className="flex-1">
 								{/* Date badge with "NEXT SHOW" indicator */}
@@ -55,8 +71,10 @@ export default function TourDatesWidget({ widgetData }) {
 								</div>
 
 								{/* Venue and city */}
-								<div className="text-lg font-semibold text-gray-900">{tourDate.venue}</div>
-								<div className="text-gray-600">{tourDate.city}</div>
+								<div className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
+									{tourDate.venue}
+								</div>
+								<div style={{ color: "var(--color-text-secondary)" }}>{tourDate.city}</div>
 							</div>
 
 							{/* Ticket button */}
@@ -66,7 +84,11 @@ export default function TourDatesWidget({ widgetData }) {
 										href={tourDate.ticketLink}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+										className="inline-block px-4 py-2 rounded hover:opacity-90 transition-opacity text-sm font-medium"
+										style={{
+											backgroundColor: "var(--color-accent)",
+											color: "var(--color-widget)",
+										}}>
 										Get Tickets
 									</a>
 								</div>

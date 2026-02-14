@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { usePage } from "../context/PageContext";
+import { useTheme } from "../context/ThemeContext";
 import WidgetList from "../components/WidgetList";
 import ThemeSelector from "../components/ThemeSelector";
 import AddWidgetModal from "../components/AddWidgetModal";
@@ -12,6 +13,7 @@ export default function DashboardPage() {
 	const { user, token, logout } = useAuth();
 	const { page, editMode, loading, loadMyPage, updateTheme, toggleEditMode, addWidget, removeWidget, updateWidgetData, reorderPageWidgets } =
 		usePage();
+	const { applyTheme } = useTheme();
 	const navigate = useNavigate();
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [operationLoading, setOperationLoading] = useState(false);
@@ -23,6 +25,14 @@ export default function DashboardPage() {
 			loadMyPage(token);
 		}
 	}, [token]);
+
+	// Apply theme when page data is loaded
+	useEffect(() => {
+		if (page) {
+			const theme = page.theme || "ocean-light";
+			applyTheme(theme);
+		}
+	}, [page, applyTheme]);
 
 	// Auto-dismiss error after 5 seconds
 	useEffect(() => {
@@ -37,9 +47,10 @@ export default function DashboardPage() {
 	const handleThemeChange = async (newTheme) => {
 		try {
 			await updateTheme(token, newTheme);
-			await loadMyPage(token);
+			// Theme updates immediately via PageContext
 		} catch (error) {
 			console.error("Error changing theme:", error);
+			setError(error.message || "Failed to update theme. Please try again.");
 		}
 	};
 

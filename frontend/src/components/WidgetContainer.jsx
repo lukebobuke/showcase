@@ -67,9 +67,22 @@ export default function WidgetContainer({
 	};
 
 	return (
-		<div className="bg-white p-4 rounded-lg shadow mb-4 relative">
+		<div
+			className="p-4 rounded-lg shadow mb-4 relative"
+			style={{
+				backgroundColor: "var(--color-widget)",
+				borderColor: "var(--color-border)",
+				border: "1px solid",
+			}}>
 			{/* Widget type badge */}
-			<span className="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm">{widget.widgetType}</span>
+			<span
+				className="absolute top-2 right-2 px-2 py-1 rounded text-sm"
+				style={{
+					backgroundColor: "var(--color-border)",
+					color: "var(--color-text)",
+				}}>
+				{widget.widgetType}
+			</span>
 
 			{/* Widget content area */}
 			<div className="mt-6">{renderWidgetContent()}</div>
