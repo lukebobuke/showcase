@@ -16,7 +16,10 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
 	cors({
-		origin: "*",
+		origin: [
+			"http://localhost:5173", // Local dev
+			"https://showcase-app.onrender.com", // Production (use YOUR actual URL)
+		],
 		credentials: true,
 	}),
 );
