@@ -33,17 +33,21 @@ export function AuthProvider({ children }) {
 	// Load token from localStorage on mount
 	useEffect(() => {
 		const loadUser = async () => {
-			const storedToken = localStorage.getItem("token");
+			const savedToken = localStorage.getItem("token");
 
-			if (storedToken) {
-				setToken(storedToken);
-				const userData = await getCurrentUser(storedToken);
-				if (userData) {
-					setUser(userData);
+			if (savedToken) {
+				setToken(savedToken);
+				try {
+					const userData = await api.getCurrentUser(savedToken);
+					setUser(userData.user);
+				} catch (error) {
+					// Token invalid, clear it
+					localStorage.removeItem("token");
+					setToken(null);
+					setUser(null);
 				}
 			}
-
-			setLoading(false);
+			setLoading(false); // Important!
 		};
 
 		loadUser();
