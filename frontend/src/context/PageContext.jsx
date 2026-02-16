@@ -1,7 +1,7 @@
 /** @format */
 
 import { createContext, useContext, useState } from "react";
-import { getMyPage, updatePage, createWidget, updateWidget, deleteWidget, reorderWidgets } from "../services/api";
+import { getMyPage, updatePage, createWidget, updateWidget, deleteWidget, reorderWidgets, updatePageSettings } from "../services/api";
 
 /**
  * Context for managing page and widget state
@@ -89,6 +89,16 @@ export function PageProvider({ children }) {
 		}
 	};
 
+	const updateSettings = async (token, settings) => {
+		try {
+			const data = await updatePageSettings(token, settings);
+			setPage(data.page);
+		} catch (error) {
+			console.error("Error updating settings:", error);
+			throw error;
+		}
+	};
+
 	const value = {
 		page,
 		editMode,
@@ -100,6 +110,7 @@ export function PageProvider({ children }) {
 		removeWidget,
 		updateWidgetData,
 		reorderPageWidgets,
+		updateSettings,
 	};
 
 	return <PageContext.Provider value={value}>{children}</PageContext.Provider>;

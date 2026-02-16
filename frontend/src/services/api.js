@@ -160,3 +160,17 @@ export async function reorderWidgets(token, widgetIds) {
 		throw new Error(message);
 	}
 }
+
+export async function updatePageSettings(token, settings) {
+	try {
+		const response = await axios.put(`${PAGES_API_URL}/my-page/settings`, settings, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		return response.data;
+	} catch (error) {
+		const message = error.response?.data?.error || error.message || "Failed to update settings. Please try again.";
+		throw new Error(message);
+	}
+}

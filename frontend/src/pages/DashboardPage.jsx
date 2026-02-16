@@ -1,7 +1,7 @@
 /** @format */
 
 import { useNavigate, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { usePage } from "../context/PageContext";
 import { useTheme } from "../context/ThemeContext";
@@ -12,8 +12,19 @@ import Toast from "../components/Toast";
 
 export default function DashboardPage() {
 	const { user, token, logout } = useAuth();
-	const { page, editMode, loading, loadMyPage, updateTheme, toggleEditMode, addWidget, removeWidget, updateWidgetData, reorderPageWidgets } =
-		usePage();
+	const {
+		page,
+		editMode,
+		loading,
+		loadMyPage,
+		updateTheme,
+		toggleEditMode,
+		addWidget,
+		removeWidget,
+		updateWidgetData,
+		reorderPageWidgets,
+		updateSettings,
+	} = usePage();
 	const { applyTheme } = useTheme();
 	const navigate = useNavigate();
 	const [showAddModal, setShowAddModal] = useState(false);
@@ -27,12 +38,27 @@ export default function DashboardPage() {
 	const [borderThickness, setBorderThickness] = useState(1);
 	const [verticalSpacingEnabled, setVerticalSpacingEnabled] = useState(true);
 	const [fullBleedEnabled, setFullBleedEnabled] = useState(true);
+	const settingsInitialized = useRef(false);
 
 	useEffect(() => {
 		if (token) {
 			loadMyPage(token);
 		}
 	}, [token]);
+
+	// Load settings from page data when available
+	useEffect(() => {
+		if (page) {
+			setMarginsEnabled(page.marginsEnabled ?? true);
+			setBorderRadiusEnabled(page.borderRadiusEnabled ?? true);
+			setBorderEnabled(page.borderEnabled ?? true);
+			setBorderThickness(page.borderThickness ?? 1);
+			setVerticalSpacingEnabled(page.verticalSpacingEnabled ?? true);
+			setFullBleedEnabled(page.fullBleedEnabled ?? true);
+			// Mark settings as initialized after loading from server
+			settingsInitialized.current = true;
+		}
+	}, [page]);
 
 	// Apply theme when page data is loaded
 	useEffect(() => {
@@ -41,6 +67,27 @@ export default function DashboardPage() {
 			applyTheme(theme);
 		}
 	}, [page, applyTheme]);
+
+	// Auto-save settings when they change (debounced)
+	useEffect(() => {
+		// Don't save on initial load, only save after settings have been initialized
+		if (!page || !token || !settingsInitialized.current) return;
+
+		const timer = setTimeout(() => {
+			updateSettings(token, {
+				marginsEnabled,
+				borderRadiusEnabled,
+				borderEnabled,
+				borderThickness,
+				verticalSpacingEnabled,
+				fullBleedEnabled,
+			}).catch((err) => {
+				console.error("Failed to save settings:", err);
+			});
+		}, 500);
+
+		return () => clearTimeout(timer);
+	}, [marginsEnabled, borderRadiusEnabled, borderEnabled, borderThickness, verticalSpacingEnabled, fullBleedEnabled, token]);
 
 	// Auto-dismiss error after 5 seconds
 	useEffect(() => {

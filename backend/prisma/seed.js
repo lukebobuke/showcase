@@ -22,13 +22,13 @@ async function main() {
 	// Hash password once to reuse for all users
 	const hashedPassword = await bcrypt.hash("password123", 10);
 
-	// ===== USER 1: Jazz Musician =====
+	// ===== USER 1: Jaco Pastorius =====
 	const user1 = await prisma.user.upsert({
-		where: { email: "jazz@demo.com" },
+		where: { email: "jaco@demo.com" },
 		update: {},
 		create: {
-			username: "jazzmusician",
-			email: "jazz@demo.com",
+			username: "jacoPastorius",
+			email: "jaco@demo.com",
 			passwordHash: hashedPassword,
 		},
 	});
@@ -55,7 +55,8 @@ async function main() {
 				pageId: page1.id,
 				widgetType: "text",
 				widgetData: {
-					text: "Award-winning jazz pianist and composer based in Chicago. With over 15 years of experience performing at prestigious venues worldwide, I bring sophisticated musicality and timeless elegance to every performance. Specializing in bebop, cool jazz, and contemporary interpretations of classic standards. Available for weddings, corporate events, jazz festivals, and intimate club performances.",
+					content:
+						"Jaco Pastorius - Revolutionary bassist and composer who transformed the possibilities of the electric bass. Pioneering fusion musician whose self-titled debut album remains a cornerstone of modern jazz. Known for technical virtuosity, innovative use of effects, and sophisticated harmonic sensibilities. His influence spans generations of musicians across rock, funk, jazz, and fusion genres. A true visionary who pushed musical boundaries and redefined what the bass could do.",
 				},
 				position: 0,
 			},
@@ -64,9 +65,9 @@ async function main() {
 				widgetType: "links",
 				widgetData: {
 					links: [
-						{ title: "Spotify", url: "https://open.spotify.com/artist/jazzmusician" },
-						{ title: "Instagram", url: "https://instagram.com/jazzpianist" },
-						{ title: "Book Me", url: "https://jazzmusician.com/booking" },
+						{ label: "Spotify", url: "https://open.spotify.com/artist/6xrNWe3tBqJwPk0OLz5bxq" },
+						{ label: "AllMusic", url: "https://www.allmusic.com/artist/jaco-pastorius-mn0000851881" },
+						{ label: "Discography", url: "https://en.wikipedia.org/wiki/Jaco_Pastorius" },
 					],
 				},
 				position: 1,
@@ -76,10 +77,10 @@ async function main() {
 				widgetType: "photos",
 				widgetData: {
 					images: [
-						"https://picsum.photos/seed/jazz1/800/600",
-						"https://picsum.photos/seed/jazz2/800/600",
-						"https://picsum.photos/seed/jazz3/800/600",
-						"https://picsum.photos/seed/jazz4/800/600",
+						"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1511344808352-52f8a94a5d69?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1485579149c0-123123?w=400&h=300&fit=crop",
 					],
 				},
 				position: 2,
@@ -87,7 +88,7 @@ async function main() {
 			{
 				pageId: page1.id,
 				widgetType: "youtube",
-				widgetData: { videoUrl: "https://www.youtube.com/watch?v=vmDDOFXSgAs" },
+				widgetData: { videoUrl: "https://www.youtube.com/watch?v=BMUXndzx3Zw" },
 				position: 3,
 			},
 			{
@@ -96,12 +97,12 @@ async function main() {
 				widgetData: {
 					dates: [
 						{
-							city: "Chicago, IL",
-							venue: "Green Mill Jazz Club",
+							city: "Miami, FL",
+							venue: "Jaco Legacy Concert",
 							date: "2026-03-15",
-							ticketLink: "https://greenmilljazz.com/tickets",
-							latitude: 41.9614,
-							longitude: -87.6597,
+							ticketLink: "https://jacolegacy.org/tickets",
+							latitude: 25.7617,
+							longitude: -80.1918,
 						},
 						{
 							city: "New York, NY",
@@ -143,13 +144,13 @@ async function main() {
 	});
 	console.log(`✓ Created 5 widgets for ${user1.username}`);
 
-	// ===== USER 2: Rock Band =====
+	// ===== USER 2: Megadeth =====
 	const user2 = await prisma.user.upsert({
-		where: { email: "rock@demo.com" },
+		where: { email: "megadeth@demo.com" },
 		update: {},
 		create: {
-			username: "rockband",
-			email: "rock@demo.com",
+			username: "megadeth",
+			email: "megadeth@demo.com",
 			passwordHash: hashedPassword,
 		},
 	});
@@ -176,7 +177,8 @@ async function main() {
 				pageId: page2.id,
 				widgetType: "text",
 				widgetData: {
-					text: "THUNDER STRIKE - Hard rock band from Seattle bringing raw power and electrifying energy to stages worldwide. 🎸⚡ Our new album 'Electric Thunder' features chart-topping single 'Storm Rising.' We blend classic rock influences with modern edge, delivering high-octane performances that leave audiences breathless. From intimate club shows to festival main stages, we bring the thunder!",
+					content:
+						"Megadeth - Legendary thrash metal band founded by Dave Mustaine, bringing machine-precise technical mastery and socially conscious lyrics since 1983. Known for groundbreaking albums including 'Peace Sells... but Who's Buying?', 'Rust in Peace', and 'Countdown to Extinction'. Featuring intricate guitar work, complex compositions, and powerful performances. A cornerstone of the thrash metal movement with a legacy spanning four decades.",
 				},
 				position: 0,
 			},
@@ -185,10 +187,10 @@ async function main() {
 				widgetType: "links",
 				widgetData: {
 					links: [
-						{ title: "Spotify", url: "https://open.spotify.com/artist/thunderstrike" },
-						{ title: "Apple Music", url: "https://music.apple.com/artist/thunderstrike" },
-						{ title: "YouTube", url: "https://youtube.com/@thunderstrike" },
-						{ title: "Merch Store", url: "https://thunderstrike.store" },
+						{ label: "Spotify", url: "https://open.spotify.com/artist/6mdiAmATAx73kdxOsXNDjB" },
+						{ label: "Official Site", url: "https://www.megadeth.com" },
+						{ label: "YouTube", url: "https://www.youtube.com/@megadeth" },
+						{ label: "Merch Store", url: "https://megadeth.shop" },
 					],
 				},
 				position: 1,
@@ -198,10 +200,10 @@ async function main() {
 				widgetType: "photos",
 				widgetData: {
 					images: [
-						"https://picsum.photos/seed/rock1/800/600",
-						"https://picsum.photos/seed/rock2/800/600",
-						"https://picsum.photos/seed/rock3/800/600",
-						"https://picsum.photos/seed/rock4/800/600",
+						"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=400&h=300&fit=crop",
 					],
 				},
 				position: 2,
@@ -209,7 +211,7 @@ async function main() {
 			{
 				pageId: page2.id,
 				widgetType: "youtube",
-				widgetData: { videoUrl: "https://www.youtube.com/watch?v=kXYiU_JCYtU" },
+				widgetData: { videoUrl: "https://www.youtube.com/watch?v=Dh-ULbQrJ2E" },
 				position: 3,
 			},
 			{
@@ -218,44 +220,44 @@ async function main() {
 				widgetData: {
 					dates: [
 						{
-							city: "Seattle, WA",
-							venue: "The Crocodile",
+							city: "Los Angeles, CA",
+							venue: "Cryptic Rock Festival",
 							date: "2026-03-01",
-							ticketLink: "https://thecrocodile.com/tickets",
-							latitude: 47.6415,
-							longitude: -122.3496,
+							ticketLink: "https://crypticrockfest.com/tickets",
+							latitude: 34.0522,
+							longitude: -118.2437,
 						},
 						{
-							city: "Portland, OR",
-							venue: "Crystal Ballroom",
-							date: "2026-03-08",
-							ticketLink: "https://crystalballroom.com/tickets",
-							latitude: 45.5202,
-							longitude: -122.6808,
-						},
-						{
-							city: "San Francisco, CA",
-							venue: "The Fillmore",
+							city: "New York, NY",
+							venue: "Madison Square Garden",
 							date: "2026-03-15",
-							ticketLink: "https://thefillmore.com/tickets",
-							latitude: 37.7833,
-							longitude: -122.4331,
+							ticketLink: "https://www.msg.com/tickets",
+							latitude: 40.7505,
+							longitude: -73.9934,
 						},
 						{
-							city: "Denver, CO",
-							venue: "Red Rocks Amphitheatre",
-							date: "2026-03-28",
-							ticketLink: "https://redrocksonline.com/tickets",
-							latitude: 39.6655,
-							longitude: -105.2053,
-						},
-						{
-							city: "Austin, TX",
-							venue: "Stubb's BBQ",
+							city: "Chicago, IL",
+							venue: "United Center",
 							date: "2026-04-05",
-							ticketLink: "https://stubbsaustin.com/tickets",
-							latitude: 30.2672,
-							longitude: -97.7385,
+							ticketLink: "https://www.unitedcenter.com/tickets",
+							latitude: 41.8806,
+							longitude: -87.6742,
+						},
+						{
+							city: "London, UK",
+							venue: "The O2 Arena",
+							date: "2026-04-20",
+							ticketLink: "https://www.theo2.co.uk/tickets",
+							latitude: 51.5076,
+							longitude: -0.1276,
+						},
+						{
+							city: "Tokyo, Japan",
+							venue: "Nippon Budokan",
+							date: "2026-05-15",
+							ticketLink: "https://www.nipponbudokan.or.jp/tickets",
+							latitude: 35.6762,
+							longitude: 139.7505,
 						},
 					],
 				},
@@ -265,13 +267,13 @@ async function main() {
 	});
 	console.log(`✓ Created 5 widgets for ${user2.username}`);
 
-	// ===== USER 3: Indie Artist =====
+	// ===== USER 3: Norah Jones =====
 	const user3 = await prisma.user.upsert({
-		where: { email: "indie@demo.com" },
+		where: { email: "norah@demo.com" },
 		update: {},
 		create: {
-			username: "indieartist",
-			email: "indie@demo.com",
+			username: "norahjones",
+			email: "norah@demo.com",
 			passwordHash: hashedPassword,
 		},
 	});
@@ -298,7 +300,8 @@ async function main() {
 				pageId: page3.id,
 				widgetType: "text",
 				widgetData: {
-					text: "Luna Rivers - Singer-songwriter weaving intimate stories through acoustic melodies. ✨🌙 My music is a journey through forests, heartbreak, healing, and the quiet magic of everyday moments. Influenced by folk traditions and contemporary indie sounds, I create spaces for reflection and connection. Currently touring coffee houses and small venues across the country, bringing warmth and vulnerability to every performance. New EP 'Whispers in the Woods' available now on all platforms.",
+					content:
+						"Norah Jones - Grammy Award-winning singer-songwriter blending soul, jazz, country, and pop into a unique sound. Known for her soulful voice, sophisticated piano playing, and emotionally resonant songwriting. Her debut album 'Come Away with Me' achieved unprecedented success. Influences include Billie Holiday and Joni Mitchell. Creating intimate, timeless music that connects deeply with listeners worldwide.",
 				},
 				position: 0,
 			},
@@ -307,10 +310,10 @@ async function main() {
 				widgetType: "links",
 				widgetData: {
 					links: [
-						{ title: "Spotify", url: "https://open.spotify.com/artist/lunarivers" },
-						{ title: "Bandcamp", url: "https://lunarivers.bandcamp.com" },
-						{ title: "Instagram", url: "https://instagram.com/lunarivers" },
-						{ title: "Support on Patreon", url: "https://patreon.com/lunarivers" },
+						{ label: "Spotify", url: "https://open.spotify.com/artist/1FmwJVDKYwB3LVHmCQH47N" },
+						{ label: "Official Site", url: "https://www.norahjones.com" },
+						{ label: "YouTube", url: "https://www.youtube.com/@NorahJones" },
+						{ label: "Instagram", url: "https://www.instagram.com/norahjones/" },
 					],
 				},
 				position: 1,
@@ -320,10 +323,10 @@ async function main() {
 				widgetType: "photos",
 				widgetData: {
 					images: [
-						"https://picsum.photos/seed/indie1/800/600",
-						"https://picsum.photos/seed/indie2/800/600",
-						"https://picsum.photos/seed/indie3/800/600",
-						"https://picsum.photos/seed/indie4/800/600",
+						"https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=400&h=300&fit=crop",
+						"https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=400&h=300&fit=crop",
 					],
 				},
 				position: 2,
@@ -331,7 +334,7 @@ async function main() {
 			{
 				pageId: page3.id,
 				widgetType: "youtube",
-				widgetData: { videoUrl: "https://www.youtube.com/watch?v=5hEh9LiSzow" },
+				widgetData: { videoUrl: "https://www.youtube.com/watch?v=tUlQaLG65aU" },
 				position: 3,
 			},
 			{
@@ -341,43 +344,43 @@ async function main() {
 					dates: [
 						{
 							city: "Nashville, TN",
-							venue: "The Bluebird Cafe",
+							venue: "Ryman Auditorium",
 							date: "2026-03-22",
-							ticketLink: "https://bluebirdcafe.com/tickets",
-							latitude: 36.1063,
-							longitude: -86.8365,
+							ticketLink: "https://www.ryman.com/tickets",
+							latitude: 36.1627,
+							longitude: -86.7816,
 						},
 						{
-							city: "Asheville, NC",
-							venue: "The Grey Eagle",
+							city: "New York, NY",
+							venue: "Carnegie Hall",
 							date: "2026-04-12",
-							ticketLink: "https://thegreyeagle.com/tickets",
-							latitude: 35.5951,
-							longitude: -82.5515,
+							ticketLink: "https://www.carnegiehall.org/tickets",
+							latitude: 40.7683,
+							longitude: -73.9795,
 						},
 						{
-							city: "Burlington, VT",
-							venue: "Higher Ground",
+							city: "Los Angeles, CA",
+							venue: "Greek Theatre",
 							date: "2026-04-28",
-							ticketLink: "https://highergroundmusic.com/tickets",
-							latitude: 44.4759,
-							longitude: -73.2121,
+							ticketLink: "https://www.greektheatrela.com/tickets",
+							latitude: 34.118,
+							longitude: -118.2437,
 						},
 						{
-							city: "Portland, ME",
-							venue: "Port City Music Hall",
+							city: "London, UK",
+							venue: "Royal Albert Hall",
 							date: "2026-05-08",
-							ticketLink: "https://portcitymusichall.com/tickets",
-							latitude: 43.6591,
-							longitude: -70.2568,
+							ticketLink: "https://www.royalalberthall.com/tickets",
+							latitude: 51.501,
+							longitude: -0.1761,
 						},
 						{
-							city: "Boston, MA",
-							venue: "Club Passim",
-							date: "2026-05-15",
-							ticketLink: "https://passim.org/tickets",
-							latitude: 42.3732,
-							longitude: -71.1189,
+							city: "Paris, France",
+							venue: "L'Olympiano Bruno Coquatrix",
+							date: "2026-05-25",
+							ticketLink: "https://www.olympibruno.com/tickets",
+							latitude: 48.832,
+							longitude: 2.3385,
 						},
 					],
 				},
@@ -389,12 +392,12 @@ async function main() {
 
 	console.log("\n🎉 Seed completed successfully!");
 	console.log("\n✨ Demo accounts created with polished content:");
-	console.log("  - jazzmusician / password123 (ocean-light) - jazz@demo.com");
-	console.log("    Award-winning jazz pianist with 5 tour dates and live performance video");
-	console.log("  - rockband / password123 (midnight-dark) - rock@demo.com");
-	console.log("    Hard rock band THUNDER STRIKE with full album and 5-city tour");
-	console.log("  - indieartist / password123 (sunset-light) - indie@demo.com");
-	console.log("    Singer-songwriter Luna Rivers with intimate acoustic performances");
+	console.log("  - jacoPastorius / password123 (ocean-light) - jaco@demo.com");
+	console.log("    Revolutionary fusion bassist with iconic performances and legacy");
+	console.log("  - megadeth / password123 (midnight-dark) - megadeth@demo.com");
+	console.log("    Legendary thrash metal band with four decades of powerful music");
+	console.log("  - norahjones / password123 (sunset-light) - norah@demo.com");
+	console.log("    Grammy-winning singer-songwriter with soulful, sophisticated sound");
 	console.log("\n📦 Each user has complete profiles:");
 	console.log("  ✓ Professional bio text");
 	console.log("  ✓ 3-4 social/streaming links");
@@ -402,9 +405,9 @@ async function main() {
 	console.log("  ✓ YouTube performance video");
 	console.log("  ✓ 5 tour dates with map coordinates");
 	console.log("\n🌐 Visit their pages at:");
-	console.log("  http://localhost:5173/jazzmusician");
-	console.log("  http://localhost:5173/rockband");
-	console.log("  http://localhost:5173/indieartist");
+	console.log("  http://localhost:5173/jacoPastorius");
+	console.log("  http://localhost:5173/megadeth");
+	console.log("  http://localhost:5173/norahjones");
 }
 
 main()

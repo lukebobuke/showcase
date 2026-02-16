@@ -50,6 +50,12 @@ export const getPageByUsername = async (req, res) => {
 				theme: page.theme,
 				headerImage: page.headerImage,
 				widgets: page.widgets,
+				marginsEnabled: page.marginsEnabled,
+				borderRadiusEnabled: page.borderRadiusEnabled,
+				borderEnabled: page.borderEnabled,
+				borderThickness: page.borderThickness,
+				verticalSpacingEnabled: page.verticalSpacingEnabled,
+				fullBleedEnabled: page.fullBleedEnabled,
 			},
 			user: {
 				username: user.username,
@@ -85,6 +91,12 @@ export const getMyPage = async (req, res) => {
 				theme: page.theme,
 				headerImage: page.headerImage,
 				widgets: page.widgets,
+				marginsEnabled: page.marginsEnabled,
+				borderRadiusEnabled: page.borderRadiusEnabled,
+				borderEnabled: page.borderEnabled,
+				borderThickness: page.borderThickness,
+				verticalSpacingEnabled: page.verticalSpacingEnabled,
+				fullBleedEnabled: page.fullBleedEnabled,
 			},
 		});
 	} catch (error) {
@@ -147,5 +159,41 @@ export const updatePage = async (req, res) => {
 		}
 		console.error("Error updating page:", error);
 		res.status(500).json({ error: "Unable to update page. Please try again." });
+	}
+};
+
+// Update page layout settings (authenticated)
+export const updatePageSettings = async (req, res) => {
+	try {
+		const userId = req.user.id;
+		const { marginsEnabled, borderRadiusEnabled, borderEnabled, borderThickness, verticalSpacingEnabled, fullBleedEnabled } = req.body;
+
+		// Build update data object
+		const updateData = {};
+		if (marginsEnabled !== undefined) updateData.marginsEnabled = marginsEnabled;
+		if (borderRadiusEnabled !== undefined) updateData.borderRadiusEnabled = borderRadiusEnabled;
+		if (borderEnabled !== undefined) updateData.borderEnabled = borderEnabled;
+		if (borderThickness !== undefined) updateData.borderThickness = borderThickness;
+		if (verticalSpacingEnabled !== undefined) updateData.verticalSpacingEnabled = verticalSpacingEnabled;
+		if (fullBleedEnabled !== undefined) updateData.fullBleedEnabled = fullBleedEnabled;
+
+		// Update page settings
+		const page = await prisma.page.update({
+			where: { userId },
+			data: updateData,
+			include: {
+				widgets: {
+					orderBy: { position: "asc" },
+				},
+			},
+		});
+
+		res.status(200).json({ page });
+	} catch (error) {
+		if (error.code === "P2025") {
+			return res.status(404).json({ error: "Page not found" });
+		}
+		console.error("Error updating page settings:", error);
+		res.status(500).json({ error: "Unable to update settings. Please try again." });
 	}
 };

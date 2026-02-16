@@ -82,7 +82,16 @@ export default function PublicPage() {
 	return (
 		<div className="theme-scope max-w-4xl mx-auto p-8">
 			<h1 className="text-3xl font-bold mb-4">{user?.username}</h1>
-			<WidgetList widgets={page.widgets || []} editMode={false} />
+			<WidgetList
+				widgets={page.widgets || []}
+				editMode={false}
+				borderRadiusEnabled={page.borderRadiusEnabled ?? true}
+				borderEnabled={page.borderEnabled ?? true}
+				borderThickness={page.borderThickness ?? 1}
+				marginsEnabled={page.marginsEnabled ?? true}
+				verticalSpacingEnabled={page.verticalSpacingEnabled ?? true}
+				fullBleedEnabled={page.fullBleedEnabled ?? true}
+			/>
 		</div>
 	);
 }

@@ -36,7 +36,7 @@ function PhotoAlbumWidget({ widgetData, borderRadiusEnabled = true }) {
 							alt={`Photo ${index + 1}`}
 							onClick={() => setSelectedImage(image)}
 							loading="lazy"
-							className="h-20 object-cover cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0"
+							className="h-32 object-cover cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0"
 							style={{ width: "auto" }}
 						/>
 					))}
