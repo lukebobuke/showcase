@@ -2,15 +2,12 @@
 
 import axios from "axios";
 
-// API endpoint URLs - hardcoded for development
-// TODO: Replace with environment variables for production deployment
-const API_URL = "http://localhost:5000/api/auth";
-const PAGES_API_URL = "http://localhost:5000/api/pages";
-const WIDGETS_API_URL = "http://localhost:5000/api/widgets";
+// API endpoint URL - uses environment variable for production
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export async function register(username, email, password) {
 	try {
-		const response = await axios.post(`${API_URL}/register`, {
+		const response = await axios.post(`${API_URL}/api/auth/register`, {
 			username,
 			email,
 			password,
@@ -24,7 +21,7 @@ export async function register(username, email, password) {
 
 export async function login(email, password) {
 	try {
-		const response = await axios.post(`${API_URL}/login`, {
+		const response = await axios.post(`${API_URL}/api/auth/login`, {
 			email,
 			password,
 		});
@@ -37,7 +34,7 @@ export async function login(email, password) {
 
 export async function getCurrentUser(token) {
 	try {
-		const response = await axios.get(`${API_URL}/me`, {
+		const response = await axios.get(`${API_URL}/api/auth/me`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -52,7 +49,7 @@ export async function getCurrentUser(token) {
 // Page-related functions
 export async function getPageByUsername(username) {
 	try {
-		const response = await axios.get(`${PAGES_API_URL}/${username}`);
+		const response = await axios.get(`${API_URL}/api/pages/${username}`);
 		return response.data;
 	} catch (error) {
 		const message = error.response?.data?.error || error.message || "Something went wrong. Please try again.";
@@ -62,7 +59,7 @@ export async function getPageByUsername(username) {
 
 export async function getMyPage(token) {
 	try {
-		const response = await axios.get(`${PAGES_API_URL}/my-page`, {
+		const response = await axios.get(`${API_URL}/api/pages/my-page`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -77,7 +74,7 @@ export async function getMyPage(token) {
 export async function updatePage(token, theme, headerImage) {
 	try {
 		const response = await axios.put(
-			`${PAGES_API_URL}/my-page`,
+			`${API_URL}/api/pages/my-page`,
 			{ theme, headerImage },
 			{
 				headers: {
@@ -96,7 +93,7 @@ export async function updatePage(token, theme, headerImage) {
 export async function createWidget(token, widgetType, widgetData) {
 	try {
 		const response = await axios.post(
-			`${WIDGETS_API_URL}`,
+			`${API_URL}/api/widgets`,
 			{ widgetType, widgetData },
 			{
 				headers: {
@@ -114,7 +111,7 @@ export async function createWidget(token, widgetType, widgetData) {
 export async function updateWidget(token, widgetId, widgetData) {
 	try {
 		const response = await axios.put(
-			`${WIDGETS_API_URL}/${widgetId}`,
+			`${API_URL}/api/widgets/${widgetId}`,
 			{ widgetData },
 			{
 				headers: {
@@ -131,7 +128,7 @@ export async function updateWidget(token, widgetId, widgetData) {
 
 export async function deleteWidget(token, widgetId) {
 	try {
-		const response = await axios.delete(`${WIDGETS_API_URL}/${widgetId}`, {
+		const response = await axios.delete(`${API_URL}/api/widgets/${widgetId}`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -146,7 +143,7 @@ export async function deleteWidget(token, widgetId) {
 export async function reorderWidgets(token, widgetIds) {
 	try {
 		const response = await axios.put(
-			`${WIDGETS_API_URL}/reorder`,
+			`${API_URL}/api/widgets/reorder`,
 			{ widgetIds },
 			{
 				headers: {
@@ -163,7 +160,7 @@ export async function reorderWidgets(token, widgetIds) {
 
 export async function updatePageSettings(token, settings) {
 	try {
-		const response = await axios.put(`${PAGES_API_URL}/my-page/settings`, settings, {
+		const response = await axios.put(`${API_URL}/api/pages/my-page/settings`, settings, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
